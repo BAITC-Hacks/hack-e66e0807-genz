@@ -54,15 +54,15 @@
 
 ### Optional enhancements in implementation
 
-- [ ] **ROUTE-01**: Enumerate bounded deterministic directed A→B→C paths and 2–3-node return cycles with aggregate leg evidence and string gid references.
-- [ ] **ROUTE-02**: Distinguish topology, strictly ordered dates, ambiguous same-day observations and recurrence across distinct episode-start days; disclose that dates cannot trace the same money.
-- [ ] **ROUTE-03**: Selected-node UI navigates every cited gid, exposes caps/truncation and unavailable states without altering original exports.
-- [ ] **RES-01**: Simulate fixed existing-priority top-N node removal, N=0..cap, on a copy and preserve original graph.
-- [ ] **RES-02**: Include isolates and before/after weak-component, largest-component and isolate metrics with both surviving and original denominators.
-- [ ] **RES-03**: Bounded UI scenario selector labels hypothetical removal and retains original data/export behavior.
-- [ ] **ANOM-01**: Compare observed node metrics within same-depth cohorts using deterministic robust baseline and explicit cohort size.
-- [ ] **ANOM-02**: Handle small cohorts, zero MAD, seed and boundary censoring; only characterize transactions observed at/above the 5,000 KZT cutoff.
-- [ ] **ANOM-03**: Present explanation, raw metric, peer baseline and limitation in the selected-node UI without risk probabilities.
+- [x] **ROUTE-01**: Enumerate bounded deterministic directed A→B→C paths and 2–3-node return cycles with aggregate leg evidence and string gid references.
+- [x] **ROUTE-02**: Distinguish topology, strictly ordered dates, ambiguous same-day observations and recurrence across distinct episode-start days; disclose that dates cannot trace the same money.
+- [x] **ROUTE-03**: Selected-node UI navigates every cited gid, exposes caps/truncation and unavailable states without altering original exports.
+- [x] **RES-01**: Simulate fixed existing-priority top-N node removal, N=0..cap, on a copy and preserve original graph.
+- [x] **RES-02**: Include isolates and before/after weak-component, largest-component and isolate metrics with both surviving and original denominators.
+- [x] **RES-03**: Bounded UI scenario selector labels hypothetical removal and retains original data/export behavior.
+- [x] **ANOM-01**: Compare observed node metrics within same-depth cohorts using deterministic robust baseline and explicit cohort size.
+- [x] **ANOM-02**: Handle small cohorts, zero MAD, seed and boundary censoring; only characterize transactions observed at/above the 5,000 KZT cutoff.
+- [x] **ANOM-03**: Present explanation, raw metric, peer baseline and limitation in the selected-node UI without risk probabilities.
 - [ ] **AI-02**: Real opt-in LLM provider with disabled offline/free baseline and explicit unavailable behavior.
 - [ ] **AI-03**: Server-owned bounded allowlisted read-only query tools, validated string gid citations, prompt-injection isolation and honest missing-information answers.
 - [ ] **AI-04**: Independent grounded-answer evaluation and baseline regression including all five must-haves, under-300-second batch, and all eight optional case features.
@@ -91,18 +91,18 @@
 | UX-01 | Phase 3 | Technical checks passed; user visual review open |
 | UX-02 | Phase 3 | Technical checks passed; user visual review open |
 | UX-03 | Phase 3 | Technical checks passed; user visual review open |
-| ROUTE-01 | Phase 4 | In progress |
-| ROUTE-02 | Phase 4 | In progress |
-| ROUTE-03 | Phase 4 | In progress |
-| RES-01 | Phase 5 | In progress |
-| RES-02 | Phase 5 | In progress |
-| RES-03 | Phase 5 | In progress |
-| ANOM-01 | Phase 6 | In progress |
-| ANOM-02 | Phase 6 | In progress |
-| ANOM-03 | Phase 6 | In progress |
-| AI-01 | Phase 7 | In progress |
-| AI-02 | Phase 7 | In progress |
-| AI-03 | Phase 7 | In progress |
-| AI-04 | Phase 7 | In progress |
+| ROUTE-01 | Phase 4 | Complete |
+| ROUTE-02 | Phase 4 | Complete |
+| ROUTE-03 | Phase 4 | Complete |
+| RES-01 | Phase 5 | Complete |
+| RES-02 | Phase 5 | Complete |
+| RES-03 | Phase 5 | Complete |
+| ANOM-01 | Phase 6 | Complete |
+| ANOM-02 | Phase 6 | Complete |
+| ANOM-03 | Phase 6 | Complete |
+| AI-01 | Phase 7 | Optional: live verification pending |
+| AI-02 | Phase 7 | Optional: live verification pending |
+| AI-03 | Phase 7 | Optional: live verification pending |
+| AI-04 | Phase 7 | Optional: live verification pending |
 
 All 33 requirement IDs map to a single active phase. UI-04 moved from Phase 1 to Phase 3 after the readability rejection. AI-01 is planned in Phase 7; the later user request authorizes its implementation and a real-model verification gate.

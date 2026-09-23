@@ -16,33 +16,33 @@
     {
       "number": "3",
       "name": "Рабочее место аналитика",
-      "status": "pending"
+      "status": "complete"
     },
     {
       "number": "4",
       "name": "Маршруты и возвраты",
-      "status": "pending"
+      "status": "complete"
     },
     {
       "number": "5",
       "name": "Устойчивость",
-      "status": "pending"
+      "status": "complete"
     },
     {
       "number": "6",
       "name": "Аномалии",
-      "status": "pending"
+      "status": "complete"
     },
     {
       "number": "7",
       "name": "AI-ассистент",
-      "status": "pending"
+      "status": "optional_live_gate_pending"
     }
   ],
   "next": {
-    "command": "$gsd-execute-phase 4",
-    "label": "Complete working analytics, Mercury UI and AI",
-    "reason": "User authorized implementation; three executors active; verify case criteria before completion."
+    "command": null,
+    "label": "Verify optional AI only after a replacement key is saved locally",
+    "reason": "Core release and seven optional analytical directions verified. No GSD. User approved external report evidence; previously posted key rejected by security review, not saved or used."
   },
-  "updated_at": "2026-09-23T12:21:13.088150+00:00"
+  "updated_at": "2026-09-23T12:34:00Z"
 }
