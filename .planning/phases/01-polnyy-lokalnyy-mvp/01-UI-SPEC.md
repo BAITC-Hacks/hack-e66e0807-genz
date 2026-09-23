@@ -2,8 +2,8 @@
 phase: "1"
 slug: "explainable-aml-mvp"
 status: draft
-shadcn_initialized: false
-preset: pending-cli-initialization
+shadcn_initialized: true
+preset: radix-nova-b2fA
 created: "2026-09-23"
 ---
 
@@ -154,3 +154,9 @@ Applicable state considerations resolved: 8 covered, 0 backstop, 0 unresolved. C
 - [ ] Dimension 7 Inventory Provenance: PASS
 
 **Approval:** pending. Inventory must be refreshed after concurrent shadcn initialization; no false claim of installed components is made.
+
+## Installed inventory — 2026-09-23
+
+Official shadcn 4.21.0 MCP `get_add_command_for_items` was called successfully via `/tmp/shadcn_mcp_probe.py`. The official installed CLI initialized `frontend/` using `--template vite --base radix --preset nova`, then added card, input, badge, alert and table. `shadcn info -c frontend` confirms Vite, TypeScript, Tailwind v4, base radix, style radix-nova and preset b2fA. Installed source paths are `frontend/src/components/ui/{button,card,input,badge,alert,table}.tsx`; all six are consumed by App/Graph. The generated preset's neutral palette is overridden by this contract's slate/teal light tokens, and its bundled Geist import is removed in favor of system fonts. No third-party registry or external runtime assets are used.
+
+Implementation inventory includes required generated `frontend/components.json`, `frontend/src/lib/utils.ts` and the npm lockfile beyond the initial plan's 13-file estimate. CLI output retained its official primitive implementation. Component tests cover exact string gid, neighbor/rank selection, boundary/isolate warnings, malformed input, load/error/retry/empty states and downloads. Production build and TypeScript check pass.

@@ -23,21 +23,21 @@
 
 ## Technology Stack
 
-Technology stack not yet documented. Will populate after codebase mapping or first phase.
+Python 3.12+ (exclude 3.14.1), pandas/pyarrow/NetworkX; React/TypeScript/Vite and official shadcn/ui. Exact dependencies: requirements*.txt and frontend/package-lock.json.
 <!-- GSD:stack-end -->
 
 <!-- GSD:conventions-start source:CONVENTIONS.md -->
 
 ## Conventions
 
-Conventions not yet established. Will populate as patterns emerge during development.
+Deterministic scoring and tie-breaking; fixed CSV schemas; additive JSON changes. Test real semantics, seed censoring and boundary cases. When changing data interfaces, read docs/DATA-CONTRACT.md first.
 <!-- GSD:conventions-end -->
 
 <!-- GSD:architecture-start source:ARCHITECTURE.md -->
 
 ## Architecture
 
-Architecture not yet mapped. Follow existing patterns found in the codebase.
+Local parquet → solution.pipeline + analytics → output CSV/JSON → allowlisted loopback server → frontend. Read docs/ARCHITECTURE.md when changing module boundaries or deployment.
 <!-- GSD:architecture-end -->
 
 <!-- GSD:skills-start source:skills/ -->
