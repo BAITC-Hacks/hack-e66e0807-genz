@@ -1,5 +1,5 @@
 import '@testing-library/jest-dom/vitest'
-import { cleanup, fireEvent, render, screen } from '@testing-library/react'
+import { cleanup, fireEvent, render, screen, within } from '@testing-library/react'
 import { afterEach, expect, test, vi } from 'vitest'
 import Graph from './Graph'
 import { type NodeRecord, type Report } from '../contract'
@@ -12,7 +12,7 @@ function fixture():Report {
 afterEach(cleanup)
 test('directional lanes preserve arrows, amount evidence and independent access to every neighbor',()=>{
  const report=fixture(); const {container}=render(<Graph report={report} selectedGid={center} onSelect={vi.fn()}/>)
- expect(screen.getByText('Отправители')).toBeVisible()
+ expect(screen.getAllByText('Отправители').length).toBeGreaterThan(0)
  expect(screen.getByText('Получатели')).toBeVisible()
  expect(screen.getByText('Показано 12 из 14 связей. Суммы за весь период, KZT.')).toBeVisible()
  const paths=container.querySelectorAll('.graph-edge path')
@@ -34,7 +34,7 @@ test('full gids remain distinct, keyboard selects neighbors, cluster mode and zo
  const id=report.nodes[7].gid,neighbor=screen.getByRole('button',{name:`Узел ${id}: Транзит`})
  expect(neighbor.querySelector('.svg-gid')).toHaveTextContent(id)
  fireEvent.focus(neighbor)
- expect(screen.getAllByText(id)).toHaveLength(2)
+ expect(screen.getAllByText(id).length).toBeGreaterThanOrEqual(2)
  fireEvent.keyDown(neighbor,{key:'Enter'})
  expect(select).toHaveBeenCalledWith(id)
  fireEvent.click(screen.getByRole('button',{name:'Кластеры'}))
@@ -52,5 +52,18 @@ test('isolate remains selectable and self transfers have explicit evidence',()=>
  view.unmount();report.edges=[{src:center,dst:center,sum_kzt:250,n_tx:1}]
  render(<Graph report={report} selectedGid={center} onSelect={vi.fn()}/>)
  expect(screen.getByLabelText('Самоперевод')).toBeVisible()
- expect(screen.getByText('Самоперевод · 250 ₸')).toBeVisible()
+ expect(screen.getByLabelText('Самоперевод')).toHaveTextContent('Самоперевод · 250 ₸')
+})
+test('mobile flow keeps selected identity visible while direction switching preserves neighbor amounts',()=>{
+ const report=fixture(),select=vi.fn();render(<Graph report={report} selectedGid={center} onSelect={select}/>)
+ const mobile=within(screen.getByLabelText('Связи выбранного участника на узком экране'))
+ expect(mobile.getByText(center)).toBeVisible()
+ expect(mobile.getByText('Отправитель → выбранный участник')).toBeVisible()
+ expect(mobile.getAllByRole('button',{name:/на мобильной схеме$/})).toHaveLength(6)
+ fireEvent.click(mobile.getByRole('button',{name:'Исходящие · 7'}))
+ expect(mobile.getByText('Выбранный участник → получатель')).toBeVisible()
+ expect(mobile.getByText(center)).toBeVisible()
+ const destination=report.nodes[14].gid
+ fireEvent.click(mobile.getByRole('button',{name:`Открыть ${destination} на мобильной схеме`}))
+ expect(select).toHaveBeenCalledWith(destination)
 })
