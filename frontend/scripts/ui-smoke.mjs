@@ -34,6 +34,7 @@ try {
  assert(arbitraryGidSeconds<60,'three arbitrary accounts can be opened within one minute')
  await search(report.nodes.at(-1).gid)
  if(report.top_nodes.length){const id=report.top_nodes[0].gid;await page.getByRole('button',{name:`Открыть узел ${id} из рейтинга`,exact:true}).click();await page.getByRole('heading',{name:`Узел ${id}`,exact:true}).waitFor()}
+ await page.getByRole('button',{name:'Рабочая область',exact:true}).click()
  await page.getByRole('img',{name:'Направленный граф выбранного узла'}).waitFor()
  const connected=report.nodes.find(n=>report.edges.some(e=>e.src===n.gid||e.dst===n.gid))
  if(connected){await search(connected.gid);assert(await page.locator('.graph-edge path[marker-end]').count()>0,'directed links have arrows')}
@@ -60,7 +61,7 @@ try {
  assert(await page.getByRole('heading',{name:'Как устроен анализ'}).isVisible(),'method explanation is accessible')
  assert((await page.locator('.methodology').innerText()).includes('Данные →'),'analysis flow is explained')
  await page.locator('.header-menu > summary').filter({hasText:'Как читать анализ'}).click()
- if(await page.locator('.mobile-queue-toggle').isVisible()&&await page.locator('.mobile-queue-toggle').getAttribute('aria-expanded')==='false')await page.locator('.mobile-queue-toggle').click()
+ await page.getByRole('button',{name:'Участники',exact:true}).click()
  await page.getByRole('button',{name:'Вся выборка',exact:true}).click()
  assert.equal(await page.getByRole('button',{name:/^Открыть узел \d+$/}).count(),Math.min(20,report.nodes.length),'initial exploration is paged')
  if(report.nodes.length>20){await page.getByRole('button',{name:'Показать ещё'}).click();assert.equal(await page.getByRole('button',{name:/^Открыть узел \d+$/}).count(),40,'more reveals twenty rows')}
@@ -90,6 +91,7 @@ try {
  await search(report.top_nodes[0].gid)
  const dense=report.nodes.reduce((best,n)=>n.out_degree>best.out_degree?n:best,report.nodes[0])
  await search(dense.gid)
+ await page.getByRole('button',{name:'Рабочая область',exact:true}).click()
  const expectedOut=report.edges.filter(e=>e.src===dense.gid&&e.dst!==dense.gid).sort((a,b)=>b.sum_kzt-a.sum_kzt||(BigInt(a.dst)<BigInt(b.dst)?-1:1))
  if(expectedOut.length>6){
   let seen=[]
@@ -131,7 +133,7 @@ try {
   assert.equal(await page.locator('.mobile-selected strong').innerText(),mobileId,'mobile selection updates graph context')
  }
  await search(report.top_nodes[0].gid)
- if(await page.locator('.mobile-queue-toggle').isVisible()&&await page.locator('.mobile-queue-toggle').getAttribute('aria-expanded')==='false')await page.locator('.mobile-queue-toggle').click()
+ await page.getByRole('button',{name:'Участники',exact:true}).click()
  await page.getByRole('button',{name:'Вся выборка',exact:true}).click()
  await choose('Граница выгрузки','Граничные')
  assert((await page.getByRole('combobox',{name:'Граница выгрузки'}).textContent()).includes('Граничные'),'mobile select is usable')
