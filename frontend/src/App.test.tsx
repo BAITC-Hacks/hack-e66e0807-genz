@@ -2,6 +2,7 @@ import '@testing-library/jest-dom/vitest'
 import { cleanup, render, screen, fireEvent } from '@testing-library/react'
 import { afterEach, expect, test, vi } from 'vitest'
 import App from './App'
+import { parseReport } from './contract'
 // Entirely synthetic fixture: never imported into production code.
 const gid = '999999999999999991'
 const node = {gid,depth:4,is_seed:false,role:'peripheral',role_score:0.2,cluster_id:0,priority_score:0.3,evidence:'Синтетический узел для проверки точности gid',in_degree:0,out_degree:0,in_sum:0,out_sum:0,pass_through:null,boundary_censored:true,seed_ancestors:0,betweenness:0,warnings:[]}
@@ -33,4 +34,38 @@ test('ranking and directed neighbor buttons use same selection',async()=>{
  expect(screen.getByText('Входящие переводы вне выборки не видны')).toBeVisible()
  fireEvent.click(screen.getByRole('button',{name:`Открыть узел ${gid} из рейтинга`}))
  expect(screen.getByRole('heading',{name:`Узел ${gid}`})).toBeVisible()
+})
+test('loading, fetch failure and retry have actionable distinct states',async()=>{
+ vi.stubGlobal('fetch',vi.fn().mockRejectedValueOnce(new Error('offline')).mockResolvedValueOnce({ok:true,json:async()=>fixture}))
+ render(<App />)
+ expect(screen.getByText('Загружаем граф и результаты анализа…')).toBeVisible()
+ expect(await screen.findByRole('alert')).toHaveTextContent('Не удалось загрузить результаты анализа.')
+ fireEvent.click(screen.getByRole('button',{name:'Повторить загрузку'}))
+ expect(await screen.findByLabelText('Поиск по gid')).toBeVisible()
+})
+test('empty report and unsupported schema are explained',async()=>{
+ vi.stubGlobal('fetch',vi.fn().mockResolvedValue({ok:true,json:async()=>({...fixture,nodes:[],clusters:[]})}))
+ const view=render(<App />)
+ expect(await screen.findByText('В выгрузке пока нет узлов')).toBeVisible()
+ view.unmount()
+ vi.stubGlobal('fetch',vi.fn().mockResolvedValue({ok:true,json:async()=>({...fixture,schema_version:'2.0'})}))
+ render(<App />)
+ expect(await screen.findByRole('alert')).toHaveTextContent('Неподдерживаемая версия схемы отчёта.')
+})
+test('validator rejects unsafe identifiers, dangling references and nonfinite numbers',()=>{
+ expect(()=>parseReport({...fixture,nodes:[{...node,gid:999}]})).toThrow()
+ expect(()=>parseReport({...fixture,edges:[{src:gid,dst:'missing',sum_kzt:1,n_tx:1}]})).toThrow()
+ expect(()=>parseReport({...fixture,nodes:[{...node,in_sum:Infinity}]})).toThrow()
+ expect(()=>parseReport({...fixture,nodes:[node,node]})).toThrow()
+})
+test('CSV links and graph controls have accessible names',async()=>{
+ vi.stubGlobal('fetch',vi.fn().mockResolvedValue({ok:true,json:async()=>({...fixture,top_nodes:[{rank:1,gid,role:'peripheral',priority_score:0.3,why:'Проверить'}]})}))
+ render(<App />)
+ expect(await screen.findByRole('link',{name:'Скачать роли CSV'})).toHaveAttribute('href','/data/nodes_roles.csv')
+ expect(screen.getByRole('link',{name:'Скачать кластеры CSV'})).toHaveAttribute('href','/data/clusters.csv')
+ expect(screen.getByRole('link',{name:'Скачать приоритеты CSV'})).toHaveAttribute('href','/data/top_nodes.csv')
+ fireEvent.click(screen.getByRole('button',{name:'Кластеры'}))
+ expect(screen.getByRole('button',{name:'Кластеры'})).toHaveAttribute('aria-pressed','true')
+ fireEvent.click(screen.getByRole('button',{name:'Приблизить'}))
+ expect(screen.getByRole('img',{name:'Направленный граф выбранного узла'})).toBeVisible()
 })

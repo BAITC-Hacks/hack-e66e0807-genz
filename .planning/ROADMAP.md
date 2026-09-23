@@ -53,7 +53,7 @@ Plans:
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
-| 1. Полный локальный MVP | 0/TBD | Not started | - |
+| 1. Полный локальный MVP | 1/3 | In progress — review repair | - |
 | 2. Временные паттерны и углублённая проверка | 0/TBD | Not started | - |
 
 ## Coverage
