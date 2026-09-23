@@ -1,0 +1,3 @@
+# Keep development coordination in git history, outside source release archives.
+.planning export-ignore
+AGENTS.md export-ignore

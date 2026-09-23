@@ -1,6 +1,20 @@
-# Data contract v1
+# Контракт данных v1.0
 
-This is the shared authoritative analytics/UI boundary. No network API: UI fetches `/data/report.json` and downloads `/data/nodes_roles.csv`, `/data/clusters.csv`, `/data/top_nodes.csv`. Python writes into chosen `--out` directory. Integration copies/mounts it as `/data`. JSON UTF-8, finite numbers, no NaN/Infinity, gid/src/dst always strings; CSV gid remains integer.
+Этот документ описывает границу пакетного расчёта и интерфейса. Сервер раздаёт статические результаты по HTTP: `/data/report.json`, `/data/nodes_roles.csv`, `/data/clusters.csv`, `/data/top_nodes.csv`. Динамических запросов к аналитике нет: выбор узла и фильтрация выполняются в браузере. Python пишет файлы в каталог `--out`, а сервер публикует этот каталог по указанным четырём адресам.
+
+JSON — UTF-8; числа конечные, без NaN/Infinity; `gid`, `src`, `dst` всегда строки. В CSV идентификатор записан целыми десятичными цифрами. При импорте CSV в электронные таблицы выбирайте тип «текст», чтобы избежать округления длинных gid.
+
+## Входные таблицы
+
+| Файл | Обязательные поля | Инварианты |
+|---|---|---|
+| `nodes.parquet` | `gid: integer`, `depth: integer`, `is_seed: boolean` | Непустая таблица; уникальный gid; depth ≥ 0; изоляты допустимы |
+| `edges.parquet` | `src,dst: integer`, `sum_kzt: number`, `n_tx,depth: integer` | Одна строка на направленную пару; известные узлы; сумма ≥ 0, n_tx ≥ 1 |
+| `transactions.parquet` | `src,dst: integer`, `sum_kzt: number`, `date: date-compatible` | Известные узлы; сумма ≥ 0; дата разбирается без пропусков |
+
+Дополнительные входные колонки не используются. Обязательные поля не могут содержать null. Агрегация транзакций по `(src,dst)` должна дать тот же набор пар, число транзакций и суммы, что edges; допуск суммы 0,01 KZT. Самоперевод допустим. `depth` — характеристика исходной выгрузки, а не вычисленная роль.
+
+## Выходной JSON
 
 ```ts
 type Role = 'consolidator'|'transit'|'distributor'|'terminal'|'coordinator'|'peripheral';
@@ -34,13 +48,30 @@ CSV exact schemas:
 - clusters.csv: cluster_id,n_nodes,n_seed,sum_kzt_internal,top_gids,hypothesis (`top_gids` serialized with `;`)
 - top_nodes.csv: rank,gid,role,priority_score,why
 
-Backend public entry: `solution.pipeline.run_pipeline(data_dir: Path, out_dir: Path) -> dict` returns Report and writes all outputs. CLI parent calls it. Python package entry may delegate to this function. Analytics owner owns solution/pipeline.py and solution/analytics.py (may add supporting files), tests/test_analytics.py. Integration owns solution/__main__.py, solution/server.py, tests/test_contracts.py, scripts/, README, root dependency files. UI owner owns frontend/ exclusively.
+Публичная Python-функция: `solution.pipeline.run_pipeline(data_dir: Path, out_dir: Path) -> dict`. Она возвращает отчёт и записывает четыре файла. CLI: `python -m solution --data <каталог> --out <каталог>`. Неверный вход приводит к ошибке до записи результатов.
+
+### Дополнительные поля верхнего уровня
+
+Писатель также выдаёт `meta.n_weak_components`, `meta.n_isolates` и `methodology: Record<string,string>` с текстовыми правилами. Они не обязательны для чтения базового отчёта. Потребитель игнорирует неизвестные добавочные поля. Поля `has_invalid_optional` в файле нет: это внутренний результат проверки отчёта в браузере.
+
+### Ссылочная целостность и единицы
+
+- Все `edges.src/dst` и элементы `clusters.top_gids`/`top_nodes.gid` ссылаются на существующие `nodes.gid`.
+- У каждого узла один cluster_id, которому соответствует строка clusters. Роль входит в закрытый словарь, обе оценки лежат в [0,1].
+- Денежные поля — наблюдаемые KZT, не остаток на счёте. `in_degree/out_degree` — число контрагентов, а не число транзакций.
+- `pass_through=null` означает seed или отсутствие наблюдаемого входа. Числовое значение на depth=4 всё равно не разрешает делать вывод об удержании: действует boundary_censored.
+- `evidence` и `why` — непустые объяснения; evidence ограничено 200 символами. Даты — календарные `YYYY-MM-DD`; пустой период допустим для набора без транзакций.
+- При отсутствии необязательной аналитики интерфейс показывает отсутствие данных; `null` у peak/synchrony в полном отчёте означает, что порог не выполнен.
+
+### Совместимость и ошибки чтения
+
+Версия `1.0` допускает добавочные поля, но не изменение смысла существующих. Неподдерживаемая версия, ошибочные обязательные поля или неизвестные ссылки вызывают видимую ошибку загрузки. Ошибки необязательных временных данных дают предупреждение: базовая карточка остаётся доступной. Frontend проверяет форму и часть смысловых ограничений; полный независимый валидатор дополнительно сверяет результаты с исходными таблицами. Наличие frontend-парсера не заменяет эту проверку.
 
 Determinism: fixed random seed, stable gid sorting and stable cluster numbering. Tied top ranks use numeric gid. elapsed_seconds may vary; deterministic CSVs must not.
 
-## Phase 2 additive node fields (schema_version remains `1.0`)
+## Необязательные временные поля (`schema_version: 1.0`)
 
-Phase 2 adds optional fields to `NodeRecord`; existing reports without them remain valid. The three CSV schemas above, roles, and scores do not change. JSON identifiers remain strings.
+Следующие поля расширяют `NodeRecord`; ранее рассчитанные отчёты без них остаются допустимыми. The three CSV schemas above, roles, and scores do not change. JSON identifiers remain strings.
 
 ```ts
 interface TemporalExample { incoming_date: string; outgoing_date: string } // YYYY-MM-DD
@@ -60,7 +91,7 @@ interface TemporalEvidence {
     date: string; count: number; share: number; baseline_daily_count: number;
   };
 }
-interface NodeRecordPhase2 extends NodeRecord {
+interface EnrichedNodeRecord extends NodeRecord {
   temporal?: TemporalEvidence;
   next_data_requests?: string[];
 }
@@ -74,4 +105,4 @@ Daily activity counts each transaction row incident to the gid once, whether inc
 
 `next_data_requests` contains at least one concise, actionable Russian request derived from observed limitations for that gid: missing incoming history for seeds or nodes with no observed incoming rows; continuation beyond depth 4 for boundary-censored nodes; transaction timestamps, reference identifiers and account statements where temporal coincidence needs testing; or data beyond the bank/period boundary. Every request names the gid or observed date/metric and does not infer guilt or identity of funds. The UI displays these strings as analyst follow-up requests, and gracefully handles their absence in older reports.
 
-The Python writer emits a complete `TemporalEvidence` object. A reader of an older or partial report treats absent optional fields as unavailable evidence, never as a measured zero. Invalid optional values are ignored with a nonfatal UI warning while valid required Phase 1 node fields remain available. No optional value can invalidate the entire report.
+The Python writer emits a complete `TemporalEvidence` object. A reader of an older or partial report treats absent optional fields as unavailable evidence, never as a measured zero. Invalid optional values are ignored with a nonfatal UI warning while valid required base node fields remain available. No optional value can invalidate the entire report.

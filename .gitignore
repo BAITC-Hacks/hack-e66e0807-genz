@@ -53,3 +53,6 @@ wandb/
 
 # Frontend dependencies; committed output/ contains submission exports.
 node_modules/
+
+# Runtime coordination files are local, not submission artifacts.
+.planning/milestone.lock
