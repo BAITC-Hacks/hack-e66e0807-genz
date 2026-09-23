@@ -51,6 +51,10 @@ No project skills found. Add skills to any of: `.claude/skills/`, `.agents/skill
 
 ## GSD Workflow Enforcement
 
+Hackathon delivery: commit each completed small task promptly. Parallel agents notify the parent with exact ready file paths; the parent serializes git operations. User explicitly authorized autonomous GSD loops, parallel work after shared contracts, and repair/retest when acceptance criteria fail. Do not wait for an entire phase before committing.
+
+Library documentation: use Context7 resolve-library-id then query-docs for current library/SDK/API/CLI facts. Read docs/DATA-CONTRACT.md before changing analytics or frontend interfaces. Preserve organizer inputs under FINANCE-CASE.
+
 Before using Edit, Write, or other file-changing tools, start work through a GSD command so planning artifacts and execution context stay in sync.
 
 Use these entry points:
