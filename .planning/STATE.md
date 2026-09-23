@@ -95,3 +95,6 @@ Stopped at: Phase2 contracts and plans in progress; Phase1 accepted
 - Browser executable cache /tmp/money-graph-browsers. Full acceptance: PLAYWRIGHT_BROWSERS_PATH=/tmp/money-graph-browsers .venv/bin/python scripts/verify_delivery.py --data FINANCE-CASE/data --out output --browser (requires sandbox socket escalation).
 - Parent serializes git commit/push to origin/main. Latest confirmed pushed b4b51ba; Phase1 acceptance next commit.
 - Next: Phase2 discuss/plan/check/execute/verify. Phase1 phase.complete succeeded and state/roadmap reread. Deadline11:47UTC.
+
+## Current acceptance correction
+User rejected README clarity; Phase2 plan03 now explicitly includes run.py one-command launch, judging-oriented README/AGENTS and demo. Root run.py --skip-install --check PASS with actual data+HTTP. Frontend enhancements11tests+18browserchecksPASS; independent final review remains. Phase1 implementation complete, final documentation acceptance pending. Backend02-01complete25Python tests; source recomputation PASS297temporalnodes,38sync,265peak,444boundaryprofiles,CSVunchanged. Active: frontend summary, jury docs; root launch/docs integration.

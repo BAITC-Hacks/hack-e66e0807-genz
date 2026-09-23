@@ -57,11 +57,13 @@ Context continuity: after each phase write SUMMARY and VERIFICATION evidence, up
 
 Subagents: user permits choosing lower-cost models and effort. For new work prefer gpt-6-sol (high for implementation/verification, medium for bounded checks/docs); use gpt-6-luna only for simple read-only inventory. Avoid Astra for new subagents. Preserve already-running agents rather than restarting completed work.
 
-Project commands: Python runtime is .venv/bin/python; batch is `python3 -m solution --data FINANCE-CASE/data --out output`, local UI is `python3 -m solution.server --data output --ui frontend/dist --port 8000`. Frontend lives in frontend/; build/test commands are its package.json scripts. In the Codex sandbox, installation/network and loopback server tests may need exec escalation. This is an environment restriction, not a product workaround.
+Project commands: Judge launch is `python3 run.py` (prepares dependencies when needed, builds, computes, serves on port 8000); `python3 run.py --check` builds, computes, validates and exits; `--skip-install` uses prepared dependencies. Python runtime after setup is .venv/bin/python; batch is `python3 -m solution --data FINANCE-CASE/data --out output`. Frontend lives in frontend/; build/test commands are its package.json scripts. In the Codex sandbox, installation/network and loopback server tests may need exec escalation. This is an environment restriction, not a product workaround.
 
 Working ownership: analytics owns solution/analytics.py and pipeline.py; frontend owns frontend/; integration owns CLI/server/independent contract tests/README. Interfaces live in docs/DATA-CONTRACT.md. Report JSON ids are strings (actual gid exceeds JS safe integers); CSV ids remain int64. All original organizer files stay unchanged.
 
 Library documentation: use Context7 resolve-library-id then query-docs for current library/SDK/API/CLI facts. Read docs/DATA-CONTRACT.md before changing analytics or frontend interfaces. Preserve organizer inputs under FINANCE-CASE.
+
+Judge clarity gate: before claiming delivery ready, follow README.md from its first screen as a new reviewer: identify the product and analyst decision, run the single launch command, find an arbitrary gid, inspect a boundary node and an isolate, see temporal evidence and its limits, and locate the three CSV exports and independent verification command. If any step is unclear or fails, repair it and repeat the journey. A formal documentation checklist alone does not close this gate; the previously reported 5/5 documentation review is reopened until this journey passes.
 
 Before using Edit, Write, or other file-changing tools, start work through a GSD command so planning artifacts and execution context stay in sync.
 

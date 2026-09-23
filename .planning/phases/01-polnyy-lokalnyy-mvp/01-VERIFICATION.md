@@ -99,3 +99,7 @@ No unresolved `TBD`, `FIXME` or `XXX` markers in phase implementation/tests/deli
 The plan suggested end-of-phase human checks for visual clarity and a live presentation. The user's explicit autonomous instruction authorizes agent acceptance: real desktop/390 px views were inspected and the five-minute script, command path and actual-node examples were checked. No human sign-off, separate clean-machine installation or live-audience demo was observed. Those are presentation/reproduction limitations, not missing phase artifacts or a failed executable criterion. There are no gaps requiring `$gsd-plan-phase --gaps`.
 
 _Verifier: gsd-verifier agent; no commit made._
+
+## Follow-up acceptance correction — 2026-09-23 11:26UTC
+
+User found README insufficiently understandable for independent jury evaluation. Original automated verification proved artifact presence and executable commands, not sufficient first-use clarity. Delivery documentation is reopened for focused acceptance under Phase2 plan03: one-command launcher, unfamiliar-reviewer instructions, architecture presentation and timed demo. Original implementation evidence remains valid, but final submission readiness must not be claimed until this follow-up is verified. No human sign-off is implied.
