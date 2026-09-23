@@ -1,5 +1,7 @@
 # Phase 03 UI design contract
 
+Canonical public design: [DESIGN.md](../../../..//DESIGN.md). Full gids are now displayed on every visible graph node, strengthening the minimum focus/selection requirement below. Geist is explicitly imported from the existing font package.
+
 ## Design read and audit
 Minimal professional analyst workbench; Design Taste plus minimalist-ui adapted to functional product UI. Existing radial graph hides direction in crossing lines; stacked summaries and filters push the primary task below the fold. Preserve installed Geist, official shadcn controls and trusted semantic data. No decorative hero, gradients, photography or new library. Dials: variance 3, motion 1, density 5. Existing lucide dependency is retained for consistent controls; no extra icon system.
 

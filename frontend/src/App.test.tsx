@@ -30,6 +30,7 @@ test('ranking and directed neighbor buttons use same selection',async()=>{
  const other={...node,gid:'999999999999999992',evidence:'Второй синтетический узел',is_seed:true}
  vi.stubGlobal('fetch',vi.fn().mockResolvedValue({ok:true,json:async()=>({...fixture,nodes:[node,other],edges:[{src:gid,dst:other.gid,sum_kzt:120,n_tx:2}],top_nodes:[{rank:1,gid,role:'peripheral',priority_score:0.3,why:'Проверить'}]})}))
  render(<App />)
+ fireEvent.click(await screen.findByText('Исходящие связи · 1',{selector:'summary'}))
  fireEvent.click(await screen.findByRole('button',{name:`Открыть соседний узел ${other.gid}`}))
  expect(screen.getByRole('heading',{name:`Узел ${other.gid}`})).toBeVisible()
  expect(screen.getByText('Входящие переводы вне выборки не видны')).toBeVisible()
@@ -62,6 +63,7 @@ test('validator rejects unsafe identifiers, dangling references and nonfinite nu
 test('CSV links and graph controls have accessible names',async()=>{
  vi.stubGlobal('fetch',vi.fn().mockResolvedValue({ok:true,json:async()=>({...fixture,top_nodes:[{rank:1,gid,role:'peripheral',priority_score:0.3,why:'Проверить'}]})}))
  render(<App />)
+ fireEvent.click(await screen.findByText('Выгрузить CSV',{selector:'summary'}))
  expect(await screen.findByRole('link',{name:'Скачать роли CSV'})).toHaveAttribute('href','/data/nodes_roles.csv')
  expect(screen.getByRole('link',{name:'Скачать кластеры CSV'})).toHaveAttribute('href','/data/clusters.csv')
  expect(screen.getByRole('link',{name:'Скачать приоритеты CSV'})).toHaveAttribute('href','/data/top_nodes.csv')
@@ -75,6 +77,8 @@ test('selected node shows dated temporal evidence, incoming profile and ordered 
  const requests=['Запросить продолжение после глубины 4 для '+gid,'Запросить время и идентификаторы переводов 2025-01-02 для '+gid]
  vi.stubGlobal('fetch',vi.fn().mockResolvedValue({ok:true,json:async()=>({...fixture,nodes:[{...node,temporal,next_data_requests:requests}],top_nodes:[{rank:1,gid,role:'peripheral',priority_score:0.3,why:'Проверить'}]})}))
  render(<App />)
+ fireEvent.click(await screen.findByText('Временные признаки',{selector:'summary'}))
+ fireEvent.click(screen.getByText('Какие данные запросить дальше',{selector:'summary'}))
  expect(await screen.findByRole('heading',{name:'Временные признаки'})).toBeVisible()
  expect(screen.getByText('Через 1 день после поступления')).toBeVisible()
  expect(screen.getByText('Через 1–2 дня после поступления')).toBeVisible()
@@ -143,6 +147,8 @@ test('cluster overview focuses results and member navigation uses the existing i
  const other={...node,gid:'222',cluster_id:1,role:'transit',evidence:'Участник второго кластера'}
  vi.stubGlobal('fetch',vi.fn().mockResolvedValue({ok:true,json:async()=>({...fixture,nodes:[node,other],clusters:[{cluster_id:0,n_nodes:1,n_seed:0,sum_kzt_internal:0,top_gids:[gid],hypothesis:'Первый кластер'},{cluster_id:1,n_nodes:1,n_seed:0,sum_kzt_internal:300,top_gids:[other.gid],hypothesis:'Второй кластер'}],top_nodes:[{rank:1,gid,role:'peripheral',priority_score:0.3,why:'Проверить'}]})}))
  render(<App />)
+ fireEvent.click(await screen.findByRole('button',{name:'Вся выборка'}))
+ fireEvent.click(screen.getByText(/Обзор кластеров/,{selector:'summary'}))
  fireEvent.click(await screen.findByRole('button',{name:'Исследовать кластер 1'}))
  expect(screen.getByRole('heading',{name:'Результаты исследования'})).toHaveFocus()
  expect(screen.getByText('в выборке: 1 узел',{exact:false})).toBeVisible()
