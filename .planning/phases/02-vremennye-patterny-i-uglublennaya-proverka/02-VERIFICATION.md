@@ -1,10 +1,10 @@
 ---
 phase: 02-vremennye-patterny-i-uglublennaya-proverka
-verified: 2026-09-23T11:35:41Z
+verified: 2026-09-23T12:05:36Z
 status: passed
 score: 8/8 must-haves verified
-covered_files: [.planning/REQUIREMENTS.md, .planning/ROADMAP.md, .planning/phases/02-vremennye-patterny-i-uglublennaya-proverka/02-01-PLAN.md, .planning/phases/02-vremennye-patterny-i-uglublennaya-proverka/02-01-SUMMARY.md, .planning/phases/02-vremennye-patterny-i-uglublennaya-proverka/02-02-PLAN.md, .planning/phases/02-vremennye-patterny-i-uglublennaya-proverka/02-02-SUMMARY.md, .planning/phases/02-vremennye-patterny-i-uglublennaya-proverka/02-03-PLAN.md, .planning/phases/02-vremennye-patterny-i-uglublennaya-proverka/02-03-SUMMARY.md, .planning/phases/02-vremennye-patterny-i-uglublennaya-proverka/02-CONTEXT.md, AGENTS.md, README.md, docs/ARCHITECTURE.md, docs/DATA-CONTRACT.md, docs/DEMO.md, frontend/package-lock.json, frontend/package.json, frontend/scripts/ui-smoke.mjs, frontend/src/App.test.tsx, frontend/src/App.tsx, frontend/src/components/ui/select.tsx, frontend/src/contract.ts, frontend/src/index.css, output/report.json, run.py, scripts/verify_temporal.py, solution/pipeline.py, solution/temporal.py, tests/test_contracts.py, tests/test_temporal.py]
-covered_digest: "v1:sha256:c5c0b74bb631a2923780c86dcec5fc1495819b90f330e26dd903ab980aac2889"
+covered_files: [.planning/phases/02-vremennye-patterny-i-uglublennaya-proverka/02-01-PLAN.md, .planning/phases/02-vremennye-patterny-i-uglublennaya-proverka/02-01-SUMMARY.md, .planning/phases/02-vremennye-patterny-i-uglublennaya-proverka/02-02-PLAN.md, .planning/phases/02-vremennye-patterny-i-uglublennaya-proverka/02-02-SUMMARY.md, .planning/phases/02-vremennye-patterny-i-uglublennaya-proverka/02-03-PLAN.md, .planning/phases/02-vremennye-patterny-i-uglublennaya-proverka/02-03-SUMMARY.md, .planning/phases/02-vremennye-patterny-i-uglublennaya-proverka/02-CONTEXT.md, README.md, docs/DATA-CONTRACT.md, docs/DEMO.md, docs/METHODOLOGY.md, frontend/scripts/ui-smoke.mjs, frontend/src/App.test.tsx, frontend/src/App.tsx, frontend/src/components/Inspector.tsx, frontend/src/contract.ts, scripts/verify_delivery.py, scripts/verify_temporal.py, solution/pipeline.py, solution/temporal.py, tests/test_contracts.py, tests/test_temporal.py]
+covered_digest: "v1:sha256:4e8fa2325ffecfd6c45db87a522e66fc95f696651d5697619fcff1bad943c6e4"
 behavior_unverified: 0
 overrides_applied: 0
 decision_coverage:
@@ -96,3 +96,9 @@ _Verifier: gsd-verifier agent; no commit made._
 ## User acceptance correction: UI redesign required
 
 After the functional checks above, the user rejected interface and graph readability. These results remain evidence of the previous implementation’s technical behavior, not user approval of usability. UI-04 is reopened and Phase 3 must verify the redesigned graph and analyst workflow. The earlier documentation check is also superseded by the requested deeper public technical documentation audit.
+
+## Dated regression refresh — 2026-09-23T12:05:36Z
+
+The original 11:35:41Z verification above remains the historical Phase 2 finding. After the machine restart and Phase 3 presentation changes, I reran the independent temporal oracle against the current organizer parquet and exports: `.venv/bin/python scripts/verify_temporal.py --data FINANCE-CASE/data --out output` returned PASS for all 2,248 nodes, including 297 nodes with one-/two-day observations, 38 with synchronous payers, 265 with daily peaks, and 444 boundary profiles. The old `/tmp` Phase 1 CSV baseline was lost in the restart, so this refresh does **not** repeat that historical baseline comparison; the new two-run delivery verifier instead confirmed current CSV/JSON determinism and fixed schemas. Its real-data browser pass exercised 24 checks, including temporal evidence, requests, filters, arbitrary gid search, and mobile navigation. I separately reran 26 Python tests and 29 frontend tests; both suites and the current production build passed. The decision-coverage query still reports 11/11 honored.
+
+The refreshed fingerprint covers Phase 2 plans/summaries, temporal implementation, independent checks, current UI integration and relevant public explanations. Volatile coordination files (`ROADMAP.md`, `REQUIREMENTS.md`, `AGENTS.md`) and regenerated `output/report.json` are deliberately outside this digest because subsequent phase administration and elapsed time change them without changing the Phase 2 contract. This is current technical regression evidence, not user approval of the Phase 3 visual design or a fresh operating-system installation.
