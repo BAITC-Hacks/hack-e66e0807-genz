@@ -59,9 +59,11 @@ test('mobile flow keeps selected identity visible while direction switching pres
  const mobile=within(screen.getByLabelText('Связи выбранного участника на узком экране'))
  expect(mobile.getByText(center)).toBeVisible()
  expect(mobile.getByText('Отправитель → выбранный участник')).toBeVisible()
+ expect(screen.getByText('Показано 6 из 7 входящих связей. Суммы за весь период, KZT.')).toBeInTheDocument()
  expect(mobile.getAllByRole('button',{name:/на мобильной схеме$/})).toHaveLength(6)
  fireEvent.click(mobile.getByRole('button',{name:'Исходящие · 7'}))
  expect(mobile.getByText('Выбранный участник → получатель')).toBeVisible()
+ expect(screen.getByText('Показано 6 из 7 исходящих связей. Суммы за весь период, KZT.')).toBeInTheDocument()
  expect(mobile.getByText(center)).toBeVisible()
  const destination=report.nodes[14].gid
  fireEvent.click(mobile.getByRole('button',{name:`Открыть ${destination} на мобильной схеме`}))
