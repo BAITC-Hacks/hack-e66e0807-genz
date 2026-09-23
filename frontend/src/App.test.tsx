@@ -111,6 +111,11 @@ test('contradictory optional counts and below-threshold peaks are hidden without
  expect(parsed.nodes[0].temporal?.peak_day).toBeUndefined()
  expect(parsed.nodes[0].evidence).toBe(node.evidence)
 })
+test('date evidence contradicting an explicit zero matched count is omitted',()=>{
+ const parsed=parseReport({...fixture,nodes:[{...node,temporal:{outgoing_after_1_or_2d_count:0,after_1_or_2d_examples:[{incoming_date:'2025-01-02',outgoing_date:'2025-01-03'}]}}]})
+ expect(parsed.has_invalid_optional).toBe(true)
+ expect(parsed.nodes[0].temporal?.after_1_or_2d_examples).toBeUndefined()
+})
 test('exploration pages all report nodes and combines four labeled filters without narrowing gid search',async()=>{
  const nodes=Array.from({length:25},(_,i)=>({...node,gid:String(100+i),role:i%2?'transit':'peripheral',cluster_id:i%3,is_seed:i%4===0,boundary_censored:i%5===0,priority_score:i/100,evidence:`Узел ${i}`}))
  const clusters=[0,1,2].map(cluster_id=>({cluster_id,n_nodes:nodes.filter(n=>n.cluster_id===cluster_id).length,n_seed:2,sum_kzt_internal:100+cluster_id,top_gids:[],hypothesis:`Гипотеза ${cluster_id}`}))

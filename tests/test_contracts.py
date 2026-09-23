@@ -124,6 +124,17 @@ class ValidatorTests(unittest.TestCase):
         self.assertEqual(result["nodes"], 21)
         self.assertEqual(result["isolates"], 19)
 
+    def test_temporal_verifier_rejects_generic_boundary_request_even_when_gid_contains_four(self):
+        from scripts.verify_temporal import validate
+        self.assertEqual(validate(self.data, self.out)["status"], "PASS")
+        path = self.out / "report.json"
+        report = json.loads(path.read_text())
+        boundary = next(n for n in report["nodes"] if n["boundary_censored"] and "4" in n["gid"])
+        boundary["next_data_requests"] = ["Запросить операции gid " + boundary["gid"]]
+        path.write_text(json.dumps(report))
+        with self.assertRaisesRegex(ValueError, "boundary request missing"):
+            validate(self.data, self.out)
+
     def test_rejects_csv_schema_missing_duplicate_gid_and_bad_evidence(self):
         from scripts.verify_delivery import validate_exports
         import csv

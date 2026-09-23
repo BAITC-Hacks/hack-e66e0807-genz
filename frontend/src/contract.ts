@@ -33,9 +33,14 @@ function parseTemporal(value:unknown):{temporal?:TemporalEvidence;invalid:boolea
  for(const key of counts) if(key in value) {if(integer(value[key])) temporal[key]=value[key];else invalid=true}
  if('after_1_or_2d_examples' in value) {
   if(Array.isArray(value.after_1_or_2d_examples)) {
-   const examples=value.after_1_or_2d_examples.filter((item):item is TemporalExample=>object(item)&&date(item.incoming_date)&&date(item.outgoing_date))
-   if(examples.length!==value.after_1_or_2d_examples.length||examples.length>3) invalid=true
-   temporal.after_1_or_2d_examples=examples.slice(0,3)
+   const examples=value.after_1_or_2d_examples.filter((item):item is TemporalExample=>{
+    if(!object(item)||!date(item.incoming_date)||!date(item.outgoing_date)) return false
+    const days=(Date.parse(`${item.outgoing_date}T00:00:00Z`)-Date.parse(`${item.incoming_date}T00:00:00Z`))/86400000
+    return days===1||days===2
+   })
+   const keys=examples.map(item=>`${item.incoming_date}/${item.outgoing_date}`)
+   if(examples.length!==value.after_1_or_2d_examples.length||examples.length>3||keys.some((key,i)=>i>0&&key<=keys[i-1])) invalid=true
+   else temporal.after_1_or_2d_examples=examples
   } else invalid=true
  }
  if('incoming_profile' in value) {
@@ -52,8 +57,19 @@ function parseTemporal(value:unknown):{temporal?:TemporalEvidence;invalid:boolea
  if('peak_day' in value) {
   const peak=value.peak_day
   if(peak===null) temporal.peak_day=null
-  else if(object(peak)&&date(peak.date)&&integer(peak.count)&&peak.count>=3&&number(peak.share)&&peak.share>=0&&peak.share<=1&&nonnegative(peak.baseline_daily_count)) temporal.peak_day=peak as unknown as NonNullable<TemporalEvidence['peak_day']>
+  else if(object(peak)&&date(peak.date)&&integer(peak.count)&&peak.count>=3&&number(peak.share)&&peak.share>=0&&peak.share<=1&&nonnegative(peak.baseline_daily_count)&&peak.count>=2*peak.baseline_daily_count) temporal.peak_day=peak as unknown as NonNullable<TemporalEvidence['peak_day']>
   else invalid=true
+ }
+ const one=temporal.outgoing_after_1d_count,two=temporal.outgoing_after_1_or_2d_count,out=temporal.outgoing_tx_count
+ const examples=temporal.after_1_or_2d_examples
+ if(examples?.length&&(two===0||out===0||temporal.incoming_tx_count===0||(one===0&&examples.some(item=>Date.parse(`${item.outgoing_date}T00:00:00Z`)-Date.parse(`${item.incoming_date}T00:00:00Z`)===86400000)))) {
+  delete temporal.after_1_or_2d_examples
+  invalid=true
+ }
+ if((one!==undefined&&two!==undefined&&one>two)||(out!==undefined&&((one!==undefined&&one>out)||(two!==undefined&&two>out)))) {
+  delete temporal.outgoing_after_1d_count
+  delete temporal.outgoing_after_1_or_2d_count
+  invalid=true
  }
  if(Object.keys(temporal).length===0) return {invalid}
  return {temporal,invalid}

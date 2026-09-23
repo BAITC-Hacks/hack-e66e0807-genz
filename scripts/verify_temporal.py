@@ -11,7 +11,10 @@ from statistics import median
 
 import pandas as pd
 
-from verify_delivery import load_exports, require
+if __package__:
+    from .verify_delivery import load_exports, require
+else:
+    from verify_delivery import load_exports, require
 
 
 def check_number(actual, expected, label):
@@ -93,7 +96,7 @@ def validate(data: Path, out: Path, baseline: Path | None = None):
         require(isinstance(requests, list) and requests and all(isinstance(r, str) and r.strip() for r in requests), f"{gid}: requests missing")
         require(any(gid in request for request in requests), f"{gid}: requests lack node-specific context")
         if node["boundary_censored"]:
-            require(any("4" in request or "границ" in request.lower() for request in requests), f"{gid}: boundary request missing")
+            require(any("границ" in request.lower() or "depth=4" in request.lower() or "глубин" in request.lower() for request in requests), f"{gid}: boundary request missing")
             require(node["role"] != "terminal", f"{gid}: censored node falsely terminal")
             boundary_profiles += 1
         if node["is_seed"]:
@@ -104,7 +107,7 @@ def validate(data: Path, out: Path, baseline: Path | None = None):
             require((out / name).read_bytes() == (baseline / name).read_bytes(), f"Phase 1 CSV changed: {name}")
     return {"status": "PASS", "nodes": len(nodes), "nodes_with_1_or_2day_observations": temporal_nodes,
             "nodes_with_synchronous_payers": sync_nodes, "nodes_with_daily_peak": peak_nodes,
-            "boundary_profiles": boundary_profiles, "csv_baseline_identical": baseline is not None}
+            "boundary_profiles": boundary_profiles, "csv_baseline_comparison": "PASS" if baseline is not None else "not_requested"}
 
 
 def main():
