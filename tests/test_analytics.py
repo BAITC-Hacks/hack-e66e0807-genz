@@ -53,6 +53,35 @@ class PipelineTests(unittest.TestCase):
                 with self.assertRaisesRegex(ValueError, expected):
                     run(data, data / "out")
 
+    def test_blank_transaction_date_is_rejected(self):
+        run = self.pipeline()
+        with tempfile.TemporaryDirectory() as tmp:
+            data = Path(tmp)
+            fixture(data)
+            transactions = pd.read_parquet(data / "transactions.parquet")
+            transactions.loc[0, "date"] = ""
+            transactions.to_parquet(data / "transactions.parquet")
+            with self.assertRaisesRegex(ValueError, "date"):
+                run(data, data / "out")
+
+    def test_duplicate_node_and_nonfinite_amount_are_rejected(self):
+        run = self.pipeline()
+        for invalid in ("duplicate", "infinite"):
+            with self.subTest(invalid=invalid), tempfile.TemporaryDirectory() as tmp:
+                data = Path(tmp)
+                fixture(data)
+                if invalid == "duplicate":
+                    nodes = pd.read_parquet(data / "nodes.parquet")
+                    pd.concat([nodes, nodes.iloc[:1]]).to_parquet(data / "nodes.parquet")
+                    message = "duplicate gid"
+                else:
+                    edges = pd.read_parquet(data / "edges.parquet")
+                    edges.loc[0, "sum_kzt"] = float("inf")
+                    edges.to_parquet(data / "edges.parquet")
+                    message = "finite"
+                with self.assertRaisesRegex(ValueError, message):
+                    run(data, data / "out")
+
 
 class RoleTests(unittest.TestCase):
     def classify(self, **changes):

@@ -62,6 +62,8 @@ def load_and_validate(data_dir: Path):
         tx["date"] = pd.to_datetime(tx.date, errors="raise")
     except (ValueError, TypeError) as error:
         raise ValueError("transactions.date: invalid date") from error
+    if tx.date.isna().any():
+        raise ValueError("transactions.date: blank or missing date")
     agg = tx.groupby(["src", "dst"]).agg(tx_sum=("sum_kzt", "sum"), tx_count=("sum_kzt", "size")).reset_index()
     joined = edges.merge(agg, on=["src", "dst"], how="outer", indicator=True, validate="one_to_one")
     if not (joined["_merge"] == "both").all():
