@@ -12,6 +12,9 @@ import networkx as nx
 
 from .analytics import RULES, analyze
 from .temporal import enrich_temporal
+from .routes import find_routes
+from .resilience import calculate_resilience
+from .anomalies import enrich_anomalies
 
 CSV_SCHEMAS = {
     "nodes_roles.csv": ["gid", "role", "role_score", "cluster_id", "priority_score", "evidence"],
@@ -83,6 +86,7 @@ def run_pipeline(data_dir: Path, out_dir: Path) -> dict:
     records = enrich_temporal(records, tx,
                               tx.date.min().date() if len(tx) else None,
                               tx.date.max().date() if len(tx) else None)
+    records = enrich_anomalies(records, tx)
     report = {
         "schema_version": "1.0",
         "meta": {"n_nodes": len(nodes), "n_edges": len(edges), "n_transactions": len(tx),
@@ -91,13 +95,16 @@ def run_pipeline(data_dir: Path, out_dir: Path) -> dict:
                  "n_isolates": nx.number_of_isolates(graph),
                  "period_start": tx.date.min().date().isoformat() if len(tx) else "",
                  "period_end": tx.date.max().date().isoformat() if len(tx) else "",
-                 "elapsed_seconds": round(time.perf_counter() - started, 6),
+                 "elapsed_seconds": 0.0,
                  "warnings": ["Роли и оценки — эвристические гипотезы для проверки, не вероятность вины.",
                               "Наблюдаются только внутрибанковские исходящие переводы июля 2026 от 5000 KZT до depth=4; это не полный баланс."]},
         "nodes": records,
         "edges": [{"src": str(int(r.src)), "dst": str(int(r.dst)), "sum_kzt": float(r.sum_kzt), "n_tx": int(r.n_tx)} for r in edges.itertuples(index=False)],
         "clusters": clusters, "top_nodes": top, "methodology": RULES,
+        "routes": find_routes(nodes, edges, tx),
+        "resilience": calculate_resilience(graph, top),
     }
+    report["meta"]["elapsed_seconds"] = round(time.perf_counter() - started, 6)
     serialized = json.dumps(report, ensure_ascii=False, allow_nan=False, separators=(",", ":"))
     out_dir = Path(out_dir)
     out_dir.mkdir(parents=True, exist_ok=True)
