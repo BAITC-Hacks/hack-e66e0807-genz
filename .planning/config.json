@@ -67,5 +67,11 @@
   },
   "resolve_model_ids": "omit",
   "mode": "yolo",
-  "granularity": "coarse"
+  "granularity": "coarse",
+  "model_overrides": {
+    "gsd-verifier": "gpt-6-sol",
+    "gsd-executor": "gpt-6-sol",
+    "gsd-planner": "gpt-6-sol",
+    "gsd-plan-checker": "gpt-6-sol"
+  }
 }
