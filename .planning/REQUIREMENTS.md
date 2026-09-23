@@ -75,34 +75,34 @@ Roadmap creation will assign each v1 requirement to exactly one phase.
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| PIPE-01 | Pending mapping | Pending |
-| PIPE-02 | Pending mapping | Pending |
-| PIPE-03 | Pending mapping | Pending |
-| ROLE-01 | Pending mapping | Pending |
-| ROLE-02 | Pending mapping | Pending |
-| ROLE-03 | Pending mapping | Pending |
-| ROLE-04 | Pending mapping | Pending |
-| ROLE-05 | Pending mapping | Pending |
-| ROLE-06 | Pending mapping | Pending |
-| CLUS-01 | Pending mapping | Pending |
-| CLUS-02 | Pending mapping | Pending |
-| CLUS-03 | Pending mapping | Pending |
-| PRIO-01 | Pending mapping | Pending |
-| PRIO-02 | Pending mapping | Pending |
-| PRIO-03 | Pending mapping | Pending |
-| VIEW-01 | Pending mapping | Pending |
-| VIEW-02 | Pending mapping | Pending |
-| VIEW-03 | Pending mapping | Pending |
-| DOCS-01 | Pending mapping | Pending |
-| DOCS-02 | Pending mapping | Pending |
-| DOCS-03 | Pending mapping | Pending |
-| DOCS-04 | Pending mapping | Pending |
+| PIPE-01 | Phase 2 | Pending |
+| PIPE-02 | Phase 1 | Pending |
+| PIPE-03 | Phase 2 | Pending |
+| ROLE-01 | Phase 1 | Pending |
+| ROLE-02 | Phase 1 | Pending |
+| ROLE-03 | Phase 1 | Pending |
+| ROLE-04 | Phase 1 | Pending |
+| ROLE-05 | Phase 1 | Pending |
+| ROLE-06 | Phase 1 | Pending |
+| CLUS-01 | Phase 1 | Pending |
+| CLUS-02 | Phase 1 | Pending |
+| CLUS-03 | Phase 1 | Pending |
+| PRIO-01 | Phase 1 | Pending |
+| PRIO-02 | Phase 1 | Pending |
+| PRIO-03 | Phase 1 | Pending |
+| VIEW-01 | Phase 2 | Pending |
+| VIEW-02 | Phase 2 | Pending |
+| VIEW-03 | Phase 2 | Pending |
+| DOCS-01 | Phase 2 | Pending |
+| DOCS-02 | Phase 2 | Pending |
+| DOCS-03 | Phase 2 | Pending |
+| DOCS-04 | Phase 1 | Pending |
 
 **Coverage:**
 - v1 requirements: 22 total
-- Mapped to phases: 0
-- Unmapped: 22 (roadmap pending)
+- Mapped to phases: 22
+- Unmapped: 0 ✓
 
 ---
 *Requirements defined: 2026-09-23*
-*Last updated: 2026-09-23 after initial definition*
+*Last updated: 2026-09-23 after roadmap mapping*
