@@ -15,60 +15,66 @@ progress:
 
 See: .planning/PROJECT.md (updated 2026-09-23)
 
-**Core value:** An analyst can identify which client to review first and explain why using observable graph and transaction evidence, without treating a structural hypothesis as proof of guilt.
-**Current focus:** Phase 1 — Explainable Investigation Results
+**Core value:** Аналитик видит, кого проверять первым и почему, и может найти любой gid и исследовать его связи.
+**Current focus:** Phase 1 — Полный локальный MVP.
 
 ## Current Position
 
-Phase: 1 of 2 (Explainable Investigation Results)
+Phase: 1 of 2 (Полный локальный MVP)
 Plan: 0 of TBD in current phase
 Status: Ready to plan
-Last activity: 2026-09-23 — Requirements and two-phase MVP roadmap approved
+Last activity: 2026-09-23 — Создан двухфазный roadmap; все 15 требований v1 назначены в Phase 1.
 
-Progress: ░░░░░░░░░░ 0%
+Progress: [░░░░░░░░░░] 0%
 
 ## Performance Metrics
 
 **Velocity:**
 - Total plans completed: 0
-- Average duration: Not yet measured
+- Average duration: —
 - Total execution time: 0 hours
 
 **By Phase:**
 
 | Phase | Plans | Total | Avg/Plan |
 |-------|-------|-------|----------|
-| - | - | - | - |
+| 1 | 0 | — | — |
+| 2 | 0 | — | — |
 
 **Recent Trend:**
-- Last 5 plans: None yet
-- Trend: Not yet measured
-
-*Updated after each plan completion*
+- Last 5 plans: Нет завершённых планов.
+- Trend: Нет данных.
 
 ## Accumulated Context
 
 ### Decisions
 
-Decisions are logged in PROJECT.md. Current choices: one-hour MVP, all five case must-haves, deterministic explainable roles, Russian analyst-facing descriptions, and vertical delivery.
+Decisions are logged in PROJECT.md Key Decisions table.
+Recent decisions affecting current work:
+
+- PROJECT_MODE=mvp: сначала полный сдаваемый MVP, затем улучшения; отсчёт часового лимита — 2026-09-23 10:47 UTC.
+- Phase 1: общий версионированный JSON/CSV-контракт и пример данных до параллельной реализации Python analytics и shadcn UI; gid в браузере строковый.
+- Phase 1: сохранить все узлы; учитывать обрыв depth=4, seed и неполноту входящих; формулировать только гипотезы.
+- Phase 1: закрытие после реального измеренного прогона, проверок и исправления пробелов; заявленные размеры данных ещё не подтверждены.
+- Phase 2: TIME-01 и EXPL-01 после MVP; AI-01 отложен.
+- Автономные GSD-циклы и параллельные субагенты разрешены пользователем; дальнейшие решения в согласованном объёме не требуют повторного подтверждения.
 
 ### Pending Todos
 
-None yet.
+Нет отдельных задач вне roadmap.
 
 ### Blockers/Concerns
 
-- The one-hour implementation window makes scope control and early end-to-end validation critical.
-- `FINANCE-CASE/` is ignored by Git; the tracked solution and README must explain data placement and must not depend on ignored starter code at a clean checkout.
+Блокеров не выявлено. Реальные данные, доступность инструментов shadcn и производительность ещё не проверены; проверить в Phase 1. Не утверждать завершение по одному наличию файлов.
 
 ## Deferred Items
 
 | Category | Item | Status | Deferred At | Milestone |
 |----------|------|--------|-------------|-----------|
-| *(none)* | | | | |
+| AI | AI-01 — ассистент по вычисленным метрикам | Deferred | 2026-09-23 | За пределами текущего roadmap |
 
 ## Session Continuity
 
-Last session: 2026-09-23 15:21 +05
-Stopped at: Initial roadmap approved; Phase 1 ready for planning
+Last session: 2026-09-23
+Stopped at: Roadmap и traceability готовы; следующий шаг — планирование Phase 1 с ранним общим контрактом и параллельной реализацией.
 Resume file: None

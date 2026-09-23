@@ -1,48 +1,55 @@
-# Roadmap: Граф денег — Money Graph
+# Roadmap: Граф денег
 
 ## Overview
 
-Deliver a one-hour, judge-ready AML investigation aid in two vertical slices. First, turn the supplied Parquet files into complete, explainable roles, clusters, and ranked CSVs. Then add offline visual inspection and prove that a clean local run reproduces all required outputs within the case limit. Every analyst-facing description uses Russian while technical identifiers retain their specified names.
+PROJECT_MODE=mvp. Сначала аналитик получает полностью работоспособный локальный MVP, покрывающий все обязательные требования кейса и пригодный для сдачи. Общий контракт данных фиксируется до параллельной работы над аналитикой и интерфейсом shadcn/ui. После проверки MVP добавляются временные признаки и помощь в дальнейшей проверке гипотез. AI-ассистент остаётся вне этих двух фаз.
 
 ## Phases
 
-**Phase Numbering:** Integer phases are planned milestone work; decimal phases are reserved for urgent insertions.
-
-- [ ] **Phase 1: Explainable Investigation Results** - An analyst can use complete CSV outputs to identify and defend priority clients.
-- [ ] **Phase 2: Visual Review and Reproducible Submission** - An analyst can inspect the directed network and judges can run and explain the full solution.
+- [ ] **Phase 1: Полный локальный MVP** - От трёх parquet до объяснимых ролей, сообществ, приоритетов, интерфейса и воспроизводимого демо.
+- [ ] **Phase 2: Временные паттерны и углублённая проверка** - Аналитик проверяет временные гипотезы и выбирает следующие данные для запроса.
 
 ## Phase Details
 
-### Phase 1: Explainable Investigation Results
-**Goal:** An analyst can derive a complete, defensible investigation shortlist from the supplied transaction network.
-**Mode:** mvp
-**Depends on:** Nothing (first phase)
-**Requirements:** PIPE-02, ROLE-01, ROLE-02, ROLE-03, ROLE-04, ROLE-05, ROLE-06, CLUS-01, CLUS-02, CLUS-03, PRIO-01, PRIO-02, PRIO-03, DOCS-04
-**Success Criteria** (what must be TRUE):
-  1. A run over the supplied input files writes three CSVs with one valid, fully populated role row for each of the 2,248 nodes, including isolated seeds.
-  2. For any selected `gid`, an analyst can read a Russian explanation with numeric measurements for its role and priority; the rules visibly account for depth-4 truncation and missing seed inflow.
-  3. Every node maps to one reported cluster, and cluster totals and cautious hypotheses can be checked against the directed input graph.
-  4. `top_nodes.csv` contains at least 20 distinct, correctly ranked candidates with defensible Russian reasons.
-**Plans:** TBD
+### Phase 1: Полный локальный MVP
 
-### Phase 2: Visual Review and Reproducible Submission
-**Goal:** An analyst can inspect directed flows around any client, and judges can reproduce and explain the complete local solution.
-**Mode:** mvp
-**Depends on:** Phase 1
-**Requirements:** PIPE-01, PIPE-03, VIEW-01, VIEW-02, VIEW-03, DOCS-01, DOCS-02, DOCS-03
+**Goal**: Аналитик локально получает проверяемый ответ «кого смотреть первым и почему», находит любой gid и исследует связи; результат соответствует всем пяти must-have кейса и готов к сдаче.
+**Depends on**: Nothing (first phase)
+**Requirements**: DATA-01, DATA-02, DATA-03, ROLE-01, ROLE-02, ROLE-03, CLUS-01, RANK-01, UI-01, UI-02, UI-03, UI-04, SHIP-01, SHIP-02, TEST-01
 **Success Criteria** (what must be TRUE):
-  1. One documented command produces all three required CSVs and an openable offline viewer from raw Parquet in under five minutes on the supplied dataset.
-  2. An analyst can search any `gid`, including an isolated node, and inspect incoming and outgoing directed links, role, cluster, priority, and Russian explanation.
-  3. A judge can follow the Russian README on a clean machine to install dependencies, supply the data, run the solution, and understand every role threshold, limitation, and the proposed million-node scaling path.
-  4. A data-to-decision diagram and five-minute demo walkthrough let the team explain two or three selected nodes using measured evidence and cautious language.
-**UI hint:** yes
-**Plans:** TBD
+  1. Пользователь одной командой из README обрабатывает исходные edges/nodes/transactions parquet менее чем за 300 секунд и получает три CSV фиксированных схем и версионированный JSON для UI. Все входные gid, включая изоляты, представлены ровно один раз, gid в JSON строковые; проверка ссылок, сумм и числа транзакций выдаёт понятный результат.
+  2. Для любого gid аналитик видит одну из шести ролей, role_score и priority_score в [0,1], cluster_id и непустое evidence длиной не более 200 символов; карточка и описание правил объясняют роль метриками, порогами и приоритетом пересекающихся правил. Depth=4 без исходящих не становится terminal только из-за обрыва; seed и неполные входящие явно отмечены, выводы сформулированы как гипотезы.
+  3. Аналитик получает сообщество каждого узла и clusters.csv с cluster_id,n_nodes,n_seed,sum_kzt_internal,top_gids,hypothesis; top_nodes.csv содержит не менее 20 уникальных узлов с rank,gid,role,priority_score,why и объясняет порядок проверки.
+  4. В локальном интерфейсе shadcn/ui аналитик видит направленные связи, роли, кластеры и легенду; поиск любого gid, включая изолят и граничный узел, открывает карточку и доступные связи, а выбор из топ-листа ведёт к тому же узлу. Три CSV доступны для скачивания; загрузка, ошибка, отсутствие результатов и ограничения данных понятны; интерфейс читаем на узком экране, доступен клавиатурой и после локальной сборки работает без CDN.
+  5. Пользователь воспроизводит установку, расчёт и запуск UI по README, находит правила, ограничения и подход к масштабу около миллиона узлов, использует диаграмму решения и сценарий пятиминутного демо с живым прогоном и разбором 2–3 узлов. Проверки ролей, обрыва, seed, изолятов, CSV/JSON, воспроизводимости и основного пути UI проходят; время полного прогона реальных данных зафиксировано.
+**Plans**: TBD
+**UI hint**: yes
+
+**Execution constraints**: Сначала документированный JSON/CSV-контракт и согласованный пример данных, затем параллельно аналитика и shadcn UI с раздельным владением файлами; после этого интеграция, измеренный реальный прогон, проверка критериев и устранение пробелов. Данные организаторов не менять; результаты и gid не хардкодить. Часовой лимит MVP отсчитывается от 2026-09-23 10:47 UTC. Детальное разбиение планов выполняется в plan-phase.
+
+### Phase 2: Временные паттерны и углублённая проверка
+
+**Goal**: Аналитик уточняет гипотезы по временным паттернам, исследует сообщества через фильтры и видит, какие недостающие данные запросить дальше.
+**Depends on**: Phase 1
+**Requirements**: TIME-01, EXPL-01
+**Success Criteria** (what must be TRUE):
+  1. Аналитик видит вычисленные по transactions признаки поступления и последующих переводов в пределах 1–2 дней и всплесков активности; объяснение указывает наблюдаемые даты и метрики и предупреждает, что совпадение во времени не доказывает идентичность денег.
+  2. В карточке узла аналитик получает следующий запрос недостающих данных, связанный с обнаруженным ограничением выборки или проверяемой гипотезой.
+  3. Аналитик с помощью дополнительных фильтров и обзора кластеров сужает сеть до интересующих сообществ и узлов и открывает их объяснимые карточки.
+**Plans**: TBD
+**UI hint**: yes
+
+**Execution constraints**: Начинать после подтверждения всех критериев Phase 1; сохранить схемы обязательных CSV и совместимость JSON-контракта либо явно версионировать его изменение. TIME-01 и EXPL-01 — улучшения v2; AI-01 отложен и не блокирует завершение.
 
 ## Progress
 
-**Execution Order:** Phase 1 → Phase 2
+**Execution Order:** Phase 1 → Phase 2. Улучшения не задерживают сдаваемый MVP.
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
-| 1. Explainable Investigation Results | 0/TBD | Not started | - |
-| 2. Visual Review and Reproducible Submission | 0/TBD | Not started | - |
+| 1. Полный локальный MVP | 0/TBD | Not started | - |
+| 2. Временные паттерны и углублённая проверка | 0/TBD | Not started | - |
+
+## Coverage
+
+Все 15 требований v1 назначены ровно один раз в Phase 1; TIME-01 и EXPL-01 назначены в Phase 2 как улучшения v2. AI-01 отложен за пределы текущего roadmap. Исследование и реализация AI для завершения этих фаз не требуются.

@@ -37,4 +37,31 @@
 | Авторизация, потоковая обработка | Не нужны для локального батча |
 
 ## Traceability
-Заполняется GSD roadmapper: каждый v1 REQ-ID ровно в одной фазе.
+
+| Requirement | Phase | Status |
+|-------------|-------|--------|
+| DATA-01 | Phase 1 | Pending |
+| DATA-02 | Phase 1 | Pending |
+| DATA-03 | Phase 1 | Pending |
+| ROLE-01 | Phase 1 | Pending |
+| ROLE-02 | Phase 1 | Pending |
+| ROLE-03 | Phase 1 | Pending |
+| CLUS-01 | Phase 1 | Pending |
+| RANK-01 | Phase 1 | Pending |
+| UI-01 | Phase 1 | Pending |
+| UI-02 | Phase 1 | Pending |
+| UI-03 | Phase 1 | Pending |
+| UI-04 | Phase 1 | Pending |
+| SHIP-01 | Phase 1 | Pending |
+| SHIP-02 | Phase 1 | Pending |
+| TEST-01 | Phase 1 | Pending |
+
+Coverage: 15/15 v1 requirements mapped; каждый ровно в одной фазе, без пропусков.
+
+### v2 Traceability
+
+| Requirement | Phase | Status |
+|-------------|-------|--------|
+| TIME-01 | Phase 2 | Pending |
+| EXPL-01 | Phase 2 | Pending |
+| AI-01 | За пределами текущего roadmap | Deferred |
