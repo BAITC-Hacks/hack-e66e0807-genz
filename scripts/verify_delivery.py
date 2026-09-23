@@ -38,6 +38,13 @@ def finite_tree(value):
             finite_tree(item)
 
 
+def numeric_record(record, fields):
+    for field in fields:
+        value = record.get(field)
+        require(type(value) in (int, float) and math.isfinite(value) and value >= 0,
+                f"Invalid nonnegative JSON number: {field}")
+
+
 def load_exports(out_dir):
     out_dir = Path(out_dir)
     tables = {}
@@ -49,6 +56,18 @@ def load_exports(out_dir):
     report = json.loads((out_dir / "report.json").read_text(encoding="utf-8"))
     finite_tree(report)
     require(report.get("schema_version") == "1.0", "Unsupported schema_version")
+    for node in report["nodes"]:
+        numeric_record(node, ("depth", "role_score", "cluster_id", "priority_score", "in_degree", "out_degree",
+                              "in_sum", "out_sum", "seed_ancestors", "betweenness"))
+        require(type(node["is_seed"]) is bool and type(node["boundary_censored"]) is bool, "Invalid JSON boolean")
+        require(isinstance(node["warnings"], list) and all(type(w) is str for w in node["warnings"]), "Invalid warnings")
+    for edge in report["edges"]:
+        numeric_record(edge, ("sum_kzt", "n_tx"))
+    for cluster in report["clusters"]:
+        numeric_record(cluster, ("cluster_id", "n_nodes", "n_seed", "sum_kzt_internal"))
+    for top in report["top_nodes"]:
+        numeric_record(top, ("rank", "priority_score"))
+    numeric_record(report["meta"], ("n_nodes", "n_edges", "n_transactions", "n_seed", "total_kzt", "elapsed_seconds"))
     return tables, report
 
 
@@ -103,7 +122,8 @@ def validate_exports(data_dir, out_dir):
         else:
             require(isinstance(node["pass_through"], (float, int)) and abs(node["pass_through"] - out_sum[gid] / in_sum[gid]) <= 1e-6, "Pass-through ratio mismatch")
         if source["is_seed"] or source["depth"] >= 4:
-            require(node["role"] != "terminal", "Seed/boundary must not be terminal")
+            require(node["role"] not in {"terminal", "transit"}, "Seed/boundary must not be terminal/transit")
+            require(bool(node["warnings"]), "Seed/boundary caveat missing")
         if not incoming[gid] and not outgoing[gid]:
             isolates += 1
             require(node["role"] == "peripheral", "Isolate must be peripheral")
@@ -227,6 +247,6 @@ def main(argv=None):
 if __name__ == "__main__":
     try:
         raise SystemExit(main())
-    except (ValueError, OSError, subprocess.SubprocessError) as exc:
+    except (ValueError, KeyError, TypeError, OSError, subprocess.SubprocessError) as exc:
         print(f"FAIL: {exc}", file=sys.stderr)
         raise SystemExit(1)

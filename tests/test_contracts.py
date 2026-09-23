@@ -128,7 +128,7 @@ class ValidatorTests(unittest.TestCase):
         from scripts.verify_delivery import validate_exports
         import csv
         path = self.out / "nodes_roles.csv"
-        for mutation in ("schema", "missing", "duplicate", "score", "evidence", "cluster"):
+        for mutation in ("schema", "missing", "duplicate", "score", "evidence", "empty_evidence", "cluster"):
             with self.subTest(mutation=mutation):
                 self.setUp()
                 with path.open(newline="") as stream:
@@ -139,6 +139,7 @@ class ValidatorTests(unittest.TestCase):
                 elif mutation == "duplicate": rows[1]["gid"] = rows[0]["gid"]
                 elif mutation == "score": rows[0]["role_score"] = "1.01"
                 elif mutation == "evidence": rows[0]["evidence"] = "x" * 201
+                elif mutation == "empty_evidence": rows[0]["evidence"] = ""
                 elif mutation == "cluster": rows[0]["cluster_id"] = "999999"
                 with path.open("w", newline="") as stream:
                     writer = csv.DictWriter(stream, fieldnames=fields)
@@ -150,15 +151,40 @@ class ValidatorTests(unittest.TestCase):
     def test_rejects_nonstring_gid_nonfinite_json_and_rank_reference(self):
         from scripts.verify_delivery import validate_exports
         path = self.out / "report.json"
-        for mutation in ("gid", "nan", "rank", "cluster"):
+        for mutation in ("gid", "nan", "numeric_string", "rank", "cluster", "endpoint", "cluster_gid"):
             with self.subTest(mutation=mutation):
                 self.setUp()
                 report = json.loads(path.read_text())
                 if mutation == "gid": report["nodes"][0]["gid"] = int(report["nodes"][0]["gid"])
                 elif mutation == "nan": report["nodes"][0]["role_score"] = float("nan")
+                elif mutation == "numeric_string": report["nodes"][0]["in_degree"] = "1"
                 elif mutation == "rank": report["top_nodes"][0]["gid"] = "missing"
                 elif mutation == "cluster": report["clusters"][0]["n_nodes"] += 1
+                elif mutation == "endpoint": report["edges"][0]["src"] = int(report["edges"][0]["src"])
+                elif mutation == "cluster_gid": report["clusters"][0]["top_gids"][0] = int(report["clusters"][0]["top_gids"][0])
                 path.write_text(json.dumps(report))
+                with self.assertRaises(ValueError):
+                    validate_exports(self.data, self.out)
+
+    def test_rejects_cluster_sums_and_top_rank_order(self):
+        from scripts.verify_delivery import validate_exports
+        import csv
+        for filename, mutation in (("clusters.csv", "sum"), ("top_nodes.csv", "rank"), ("top_nodes.csv", "order")):
+            with self.subTest(mutation=mutation):
+                self.setUp()
+                path = self.out / filename
+                with path.open(newline="") as stream:
+                    reader = csv.DictReader(stream)
+                    fields, rows = reader.fieldnames, list(reader)
+                if mutation == "sum": rows[0]["sum_kzt_internal"] = "99999999"
+                elif mutation == "rank": rows[0]["rank"] = "2"
+                else:
+                    rows[0], rows[1] = rows[1], rows[0]
+                    rows[0]["rank"], rows[1]["rank"] = "1", "2"
+                with path.open("w", newline="") as stream:
+                    writer = csv.DictWriter(stream, fieldnames=fields)
+                    writer.writeheader()
+                    writer.writerows(rows)
                 with self.assertRaises(ValueError):
                     validate_exports(self.data, self.out)
 
