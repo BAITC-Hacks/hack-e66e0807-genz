@@ -1,82 +1,36 @@
-<!-- GSD:project-start source:PROJECT.md -->
+# Граф денег — инструкции разработки
 
-## Project
+Локальное рабочее место AML-аналитика: parquet → объяснимые метрики, роли, сообщества и приоритеты → три CSV и React-интерфейс. Основной сценарий: кого проверить → почему → связи → свидетельства.
 
-**Граф денег**
+## Работа и приёмка
 
-Локальный инструмент AML-аналитика для восстановления структуры транзакционной сети: объяснимые роли, сообщества, приоритеты проверки и интерактивный граф. На входе три parquet организаторов; на выходе три CSV фиксированных схем и чистый понятный интерфейс на shadcn/ui.
+По прямому указанию пользователя GSD отключён для всех последующих задач. Выполнять конкретное изменение, проверять критерии кейса и пользователя, исправлять ошибки, обновлять README по фактическому поведению. Незавершённые возможности явно отделять от проверенных. Не добавлять новые функции сверх согласованных UI и AI.
 
-**Core Value:** Аналитик видит, кого проверять первым и почему, и может найти любой gid и исследовать его связи.
+Коммитить каждую завершённую небольшую задачу и сразу отправлять в origin/main: пользователь это разрешил. Git выполняет только родительский агент. Параллельные агенты сообщают точные готовые файлы и не отменяют чужие изменения. Для frontend пользователь выбрал Astra high; для ограниченных backend/проверок допустим sol high/medium.
 
-### Constraints
+Внутренние записи .planning/ остаются локально и исключены из Git. При смене задачи или перед сжатием контекста обновлять STATE.md и ROADMAP.md: владельцы файлов, проверки, серверы, последний push и следующий шаг. Исторические планы не являются доказательством актуального прохождения тестов.
 
-- Время: час от начала реализации (2026-09-23 10:47 UTC); сначала сдаваемый MVP, затем улучшения.
-- Данные: ожидаются 2248 узлов, 3119 рёбер, 4840 транзакций; проверить на реальных файлах, не хардкодить результаты.
-- Обрыв на depth=4 не доказывает terminal; seed имеют неполный вход; изоляты должны сохраняться.
-- Все оценки — эвристики и гипотезы, не вероятность вины. Никаких выдуманных атрибутов.
-- Работать автономно; вопрос нужен только при неустранимом препятствии. При провале критерия исправлять и перепроверять.
-- Context7 для актуальной документации библиотек. Для UI использовать shadcn MCP при доступности; обнаружить и сообщить техническое ограничение, если инструмент недоступен.
+## Контракты и данные
 
-<!-- GSD:project-end -->
+Перед изменением интерфейсов читать docs/DATA-CONTRACT.md; перед изменением границ модулей — docs/ARCHITECTURE.md; перед frontend-изменениями — DESIGN.md. Публичные критерии и ограничения: README.md, docs/METHODOLOGY.md, docs/VALIDATION.md. Оригинальное ТЗ, когда доступно локально: FINANCE-CASE/case.md.
 
-<!-- GSD:stack-start source:STACK.md -->
+- Исходные файлы организаторов сохранять без изменений. Ожидаемые 2248 узлов / 3119 рёбер / 4840 транзакций — проверяемые свойства этой выгрузки, не зашитые ответы.
+- depth=4 не доказывает terminal; входы seed неполны; изоляты должны сохраняться. Переводы ниже 5000 KZT не наблюдаются. Даты не доказывают движение одних и тех же денег.
+- Роли и приоритеты — гипотезы, не вероятность вины. Не выдумывать атрибуты клиентов и не обогащать внешними источниками.
+- Результаты детерминированы, схемы трёх CSV фиксированы. JSON gid — строки; CSV gid — десятичные int64. Изменения JSON совместимы с прежними отчётами.
 
-## Technology Stack
+## Команды и среда
 
-Python 3.12+ (exclude 3.14.1), pandas/pyarrow/NetworkX; React/TypeScript/Vite and official shadcn/ui. Exact dependencies: requirements*.txt and frontend/package-lock.json.
-<!-- GSD:stack-end -->
+Стек: Python 3.12+ (кроме 3.14.1), pandas/pyarrow/NetworkX; React/TypeScript/Vite, Tailwind и официальные shadcn/ui. Версии фиксированы в requirements.txt и frontend/package-lock.json. Для актуальных библиотечных API использовать Context7 resolve-library-id → query-docs. Для UI использовать shadcn MCP при доступности, честно сообщать о недоступности.
 
-<!-- GSD:conventions-start source:CONVENTIONS.md -->
+Запуск жюри: `python3 run.py`; проверка: `python3 run.py --check`; подготовленное окружение: `--skip-install`. Первая установка скачивает зависимости; после неё расчёт и UI локальны. Исполнитель Python: `.venv/bin/python`. Полный тест: `.venv/bin/python -m unittest discover -s tests -v`; frontend-команды заданы в frontend/package.json.
 
-## Conventions
+Разработка: Vite8000 проксирует /data и /api на backend8765; backend запускается с ASSISTANT_DEV_ORIGIN=http://127.0.0.1:8000. Перед запуском жюри на8000 остановить dev-preview либо выбрать --port8001. Не завершать чужие процессы. Сетевые/loopback-проверки в sandbox могут требовать разрешённого запуска.
 
-Deterministic scoring and tie-breaking; fixed CSV schemas; additive JSON changes. Test real semantics, seed censoring and boundary cases. When changing data interfaces, read docs/DATA-CONTRACT.md first.
-<!-- GSD:conventions-end -->
+## Финальная проверка
 
-<!-- GSD:architecture-start source:ARCHITECTURE.md -->
+Следовать README как новый проверяющий: одна команда, произвольный gid, граничный узел, изолят, объяснение роли и приоритета, временные признаки, направление/сумма ребра, три CSV. Сверять все результаты с исходными parquet независимыми валидаторами. Сборка не заменяет браузерную проверку; отдельно просматривать снимки desktop/mobile и оба режима списка участников. Проверять отсутствие переполнения, читаемость полных gid, фильтры, loading/empty/error/focus/selected.
 
-## Architecture
+## Необязательный AI
 
-Local parquet → solution.pipeline + analytics → output CSV/JSON → allowlisted loopback server → frontend. Read docs/ARCHITECTURE.md when changing module boundaries or deployment.
-<!-- GSD:architecture-end -->
-
-<!-- GSD:skills-start source:skills/ -->
-
-## Project Skills
-
-No project skills found. Add skills to any of: `.claude/skills/`, `.agents/skills/`, `.cursor/skills/`, `.github/skills/`, or `.codex/skills/` with a `SKILL.md` index file.
-<!-- GSD:skills-end -->
-
-<!-- GSD:workflow-start source:GSD defaults -->
-
-## Delivery Workflow
-
-Delivery loop: the latest user request authorizes implementation of additional features and a Mercury-reference UI redesign. Earlier planning-only holds are superseded. GSD is disabled by explicit user override; use bounded implementation/test/repair cycles; README must track verified behavior, and real LLM inference is required to claim AI completion.
-
-Hackathon delivery: commit each completed small task promptly and immediately push to origin/main (explicit user authorization). Parallel agents notify the parent with exact ready file paths; the parent serializes git operations. User explicitly authorized autonomous GSD loops, parallel work after shared contracts, and repair/retest when acceptance criteria fail. Do not wait for an entire phase before committing.
-
-Context continuity: after each phase write SUMMARY and VERIFICATION evidence, update STATE/ROADMAP/REQUIREMENTS, then reread STATE.md and ROADMAP.md before selecting the next phase. Before context compaction record active agents, ownership, pending checks, server sessions, latest commit/push and exact next action in .planning/STATE.md. Refresh this AGENTS.md when workflow or stable project conventions change. Never infer passing checks from an old summary after code changes.
-
-Subagents: user permits choosing lower-cost models and effort. For new work prefer gpt-6-sol (high for implementation/verification, medium for bounded checks/docs); use gpt-6-luna only for simple read-only inventory. For Phase 3 UI redesign the user explicitly selected gpt-6-astra with high effort; use that override for the frontend executor. Preserve already-running agents rather than restarting completed work.
-
-Project commands: Judge launch is `python3 run.py` (prepares dependencies when needed, builds, computes, serves on port 8000); `python3 run.py --check` builds, computes, validates and exits; `--skip-install` uses prepared dependencies. Python runtime after setup is .venv/bin/python; batch is `python3 -m solution --data FINANCE-CASE/data --out output`. Frontend lives in frontend/; build/test commands are its package.json scripts. In the Codex sandbox, installation/network and loopback server tests may need exec escalation. This is an environment restriction, not a product workaround.
-
-UI changes: read DESIGN.md before modifying frontend layout, typography or graph presentation. Preserve original calculation evidence alongside readable explanations. For live development preview use Vite on port 8000 and the report server on 8765; stop that preview before the jury launcher uses port 8000.
-
-Working ownership: analytics owns solution/analytics.py and pipeline.py; frontend owns frontend/; integration owns CLI/server/independent contract tests/README. Interfaces live in docs/DATA-CONTRACT.md. Report JSON ids are strings (actual gid exceeds JS safe integers); CSV ids remain int64. All original organizer files stay unchanged.
-
-Library documentation: use Context7 resolve-library-id then query-docs for current library/SDK/API/CLI facts. Read docs/DATA-CONTRACT.md before changing analytics or frontend interfaces. Preserve organizer inputs under FINANCE-CASE.
-
-Judge clarity gate: before claiming delivery ready, follow README.md from its first screen as a new reviewer: identify the product and analyst decision, run the single launch command, find an arbitrary gid, inspect a boundary node and an isolate, see temporal evidence and its limits, and locate the three CSV exports and independent verification command. If any step is unclear or fails, repair it and repeat the journey. A formal documentation checklist alone does not close this gate. Functional browser checks do not prove usability: the user rejected the original graph readability, so Phase 3 must separately inspect screenshots and demonstrate direction, amounts, roles and the next analyst action at desktop and narrow widths.
-
-Latest user workflow override (2026-09-23): Do not use GSD for this or any subsequent request. Work directly: implement the smallest complete change, test original case and user acceptance criteria, repair failures, update README to match verified behavior, commit and immediately push. Keep STATE/ROADMAP as lightweight continuity records; do not invoke GSD commands, skills, planning gates or workflow agents. Existing historical GSD artifacts are reference only. Parallel implementation agents remain authorized; parent serializes git. The current release deadline is 12:36:30 UTC on 2026-09-23; unfinished optional features must not be presented as working. The user requests a free external AI provider for the product assistant; use Context7 for provider API documentation and never invent or expose API credentials.
-
-<!-- GSD:workflow-end -->
-
-<!-- GSD:profile-start -->
-
-## Developer Profile
-
-> Profile not yet configured. Run `$gsd-profile-user` to generate your developer profile.
-> This section is managed by `generate-claude-profile` -- do not edit manually.
-<!-- GSD:profile-end -->
+Core работает без ключа и внешнего API. OpenRouter использует только openrouter/free, без скрытого платного fallback. Ключ хранится в игнорируемом .env, никогда в Git, сообщениях или выводе команд. Пользователь разрешил передачу вопроса и ограниченных обезличенных свидетельств внешнему провайдеру. Опубликованный в чате ключ отклонён проверкой безопасности; применять только замену, сохранённую пользователем локально. Готовность AI заявлять лишь после реального ответа с проверенными ссылками; mock-тестов недостаточно.

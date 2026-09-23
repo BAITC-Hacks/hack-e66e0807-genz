@@ -59,3 +59,6 @@ node_modules/
 
 # Local CPU-model cache and runtime; never part of the submission source.
 .local-model/
+
+# Local development continuity; public evidence lives in docs/.
+.planning/
