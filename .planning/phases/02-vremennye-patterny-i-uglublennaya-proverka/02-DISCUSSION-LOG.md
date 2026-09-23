@@ -7,3 +7,5 @@
 - Design: inherited clean shadcn system, compact temporal card and cluster overview.
 - Verification: autonomous browser+unit+integration+independent reviewer; no claim of human sign-off.
 All recommendations selected in one auto pass; no unanswered user decision or scope expansion.
+
+User steering: reinforce incoming depth4 profiles and same-day multipayer synchrony; standard filters use real shadcn Select. User answered AI preference: finish analytics and visual now, AI remains deferred.

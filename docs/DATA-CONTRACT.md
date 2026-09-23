@@ -37,3 +37,41 @@ CSV exact schemas:
 Backend public entry: `solution.pipeline.run_pipeline(data_dir: Path, out_dir: Path) -> dict` returns Report and writes all outputs. CLI parent calls it. Python package entry may delegate to this function. Analytics owner owns solution/pipeline.py and solution/analytics.py (may add supporting files), tests/test_analytics.py. Integration owns solution/__main__.py, solution/server.py, tests/test_contracts.py, scripts/, README, root dependency files. UI owner owns frontend/ exclusively.
 
 Determinism: fixed random seed, stable gid sorting and stable cluster numbering. Tied top ranks use numeric gid. elapsed_seconds may vary; deterministic CSVs must not.
+
+## Phase 2 additive node fields (schema_version remains `1.0`)
+
+Phase 2 adds optional fields to `NodeRecord`; existing reports without them remain valid. The three CSV schemas above, roles, and scores do not change. JSON identifiers remain strings.
+
+```ts
+interface TemporalExample { incoming_date: string; outgoing_date: string } // YYYY-MM-DD
+interface TemporalEvidence {
+  incoming_tx_count: number;
+  outgoing_tx_count: number;
+  outgoing_after_1d_count: number;
+  outgoing_after_1_or_2d_count: number;
+  after_1_or_2d_examples: TemporalExample[]; // at most 3; ascending date pairs
+  incoming_profile: {
+    active_days: number; total_kzt: number; distinct_payers: number; median_kzt: number;
+  };
+  synchronous_incoming: null | {
+    date: string; distinct_payers: number; tx_count: number; sum_kzt: number;
+  };
+  peak_day: null | {
+    date: string; count: number; share: number; baseline_daily_count: number;
+  };
+}
+interface NodeRecordPhase2 extends NodeRecord {
+  temporal?: TemporalEvidence;
+  next_data_requests?: string[];
+}
+```
+
+For a given gid, count each outgoing transaction row once in `outgoing_after_1d_count` when at least one incoming row to that gid is dated exactly one calendar day earlier. Count each outgoing row once in `outgoing_after_1_or_2d_count` when at least one incoming row is dated one or two calendar days earlier. The one-day set is a subset of the one-or-two-day set. Multiple incoming rows never multiply a matched outgoing row. Use parsed calendar dates; same-day and later incoming rows do not match. The examples contain up to three distinct qualifying date pairs sorted by incoming date then outgoing date; they illustrate temporal coincidence, not matched amounts or traced funds.
+
+Daily activity counts each transaction row incident to the gid once, whether incoming or outgoing; a self-loop counts once. `baseline_daily_count` is total incident rows divided by the inclusive number of calendar days from report `period_start` through `period_end`. A `peak_day` is emitted only if its incident count is at least 3 and at least twice the baseline. Pick the maximum qualifying count, breaking ties by earliest date. `share` is peak count divided by total incident rows. If no day qualifies, `peak_day` is `null`. All counts are nonnegative integers; share is in [0,1]; baseline is finite and nonnegative. For an isolate, counts and examples are empty/zero and peak is null.
+
+`incoming_profile` describes observed incoming transaction rows for the gid: `active_days` is the number of distinct calendar dates with incoming rows; `total_kzt` is their amount sum; `distinct_payers` is the number of distinct source gid strings; `median_kzt` is the median incoming row amount, or 0 when there are no incoming rows. Amounts are finite, nonnegative KZT. `synchronous_incoming` is a same-calendar-day concentration of incoming rows from at least three distinct payer gids. Choose the qualifying date with the most distinct payers, breaking ties by earliest date. Its `tx_count` and `sum_kzt` cover all incoming rows on that date, including repeated rows from one payer; `distinct_payers` counts each payer once. Otherwise it is `null`. These measures apply to depth-4 nodes; a depth-4 incoming profile does not prove the node is a terminal recipient. No within-day order is inferred.
+
+`next_data_requests` contains at least one concise, actionable Russian request derived from observed limitations for that gid: missing incoming history for seeds or nodes with no observed incoming rows; continuation beyond depth 4 for boundary-censored nodes; transaction timestamps, reference identifiers and account statements where temporal coincidence needs testing; or data beyond the bank/period boundary. Every request names the gid or observed date/metric and does not infer guilt or identity of funds. The UI displays these strings as analyst follow-up requests, and gracefully handles their absence in older reports.
+
+The Python writer emits a complete `TemporalEvidence` object. A reader of an older or partial report treats absent optional fields as unavailable evidence, never as a measured zero. Invalid optional values are ignored with a nonfatal UI warning while valid required Phase 1 node fields remain available. No optional value can invalidate the entire report.
