@@ -6,7 +6,7 @@
 
 Нужны Python **3.12+ (кроме 3.14.1)** и Node.js **22.12+ с npm**. Интернет нужен при первой установке пакетов; расчёт и интерфейс работают локально, без внешнего API, GPU и учётной записи.
 
-Организатор предоставляет файлы отдельно: положите `nodes.parquet`, `edges.parquet`, `transactions.parquet` в `FINANCE-CASE/data/`. Исходные parquet не публикуются в Git и не изменяются программой. Сдаваемые рассчитанные файлы находятся в `output/`.
+Три исходных файла организаторов — `nodes.parquet`, `edges.parquet`, `transactions.parquet` — включены в каталог `data/` в корне репозитория. После клонирования переносить файлы или создавать папки не нужно. Программа читает их без изменений; рассчитанные файлы находятся в `output/`. Для другой выгрузки используйте `--data <каталог>`.
 
 **Одна команда из корня репозитория:**
 
@@ -136,8 +136,8 @@ B = b/max(b)
 .venv/bin/python -m unittest discover -s tests -v
 npm --prefix frontend test -- --run
 npm --prefix frontend run build
-.venv/bin/python scripts/verify_delivery.py --data FINANCE-CASE/data --out output
-.venv/bin/python scripts/verify_extensions.py --data FINANCE-CASE/data --out output
+.venv/bin/python scripts/verify_delivery.py --data data --out output
+.venv/bin/python scripts/verify_extensions.py --data data --out output
 ```
 
 Верификатор запускает два полных расчёта в разных каталогах, независимо сверяет все CSV/JSON с parquet, проверяет суммы и членство сообществ, ранги, граничные узлы, seed и изоляты, побайтную повторяемость CSV и JSON без времени исполнения, затем сравнивает опубликованные HTTP-файлы с диском. Unit-тесты дополнительно портят экспорты, проверяя, что валидатор действительно отклоняет нарушения.
@@ -148,7 +148,7 @@ npm --prefix frontend run build
 cd frontend
 npx playwright install chromium
 cd ..
-.venv/bin/python scripts/verify_delivery.py --data FINANCE-CASE/data --out output --browser
+.venv/bin/python scripts/verify_delivery.py --data data --out output --browser
 ```
 
 В ограниченной sandbox-среде тестам HTTP нужен доступ к loopback; ошибка `Operation not permitted` при создании сокета означает ограничение окружения, а не пройденную проверку. Не пропускайте её при приёмке.

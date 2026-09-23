@@ -5,7 +5,7 @@ from pathlib import Path
 
 def main(argv=None):
     parser = argparse.ArgumentParser(description="Calculate explainable AML hypotheses locally.")
-    parser.add_argument("--data", type=Path, default=Path("FINANCE-CASE/data"),
+    parser.add_argument("--data", type=Path, default=Path("data"),
                         help="directory with nodes, edges and transactions parquet files")
     parser.add_argument("--out", type=Path, default=Path("output"),
                         help="directory for three CSV exports and report.json")

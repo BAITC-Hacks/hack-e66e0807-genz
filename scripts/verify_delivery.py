@@ -208,7 +208,7 @@ def verify_http(out_dir, ui_dir):
 
 def main(argv=None):
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("--data", type=Path, default=ROOT / "FINANCE-CASE/data")
+    parser.add_argument("--data", type=Path, default=ROOT / "data")
     parser.add_argument("--out", type=Path, default=ROOT / "output")
     parser.add_argument("--ui", type=Path, default=ROOT / "frontend/dist")
     parser.add_argument("--browser", action="store_true", help="also run frontend browser smoke (requires browser installation)")

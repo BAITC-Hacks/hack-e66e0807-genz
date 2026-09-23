@@ -195,7 +195,7 @@ def verify(data: Path, out: Path, baseline: Path | None = None):
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("--data", type=Path, default=Path("FINANCE-CASE/data"))
+    parser.add_argument("--data", type=Path, default=Path("data"))
     parser.add_argument("--out", type=Path, default=Path("output"))
     parser.add_argument("--baseline", type=Path)
     args = parser.parse_args()

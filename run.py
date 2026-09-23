@@ -18,7 +18,7 @@ def execute(command):
 
 def main():
     parser = argparse.ArgumentParser(description="Подготовить и запустить локальный «Граф денег» одной командой.")
-    parser.add_argument("--data", type=Path, default=ROOT / "FINANCE-CASE/data")
+    parser.add_argument("--data", type=Path, default=ROOT / "data")
     parser.add_argument("--port", type=int, default=8000)
     parser.add_argument("--check", action="store_true", help="собрать, пересчитать и проверить результат, затем завершить")
     parser.add_argument("--skip-install", action="store_true", help="использовать уже установленные зависимости без скачивания")

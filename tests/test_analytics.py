@@ -166,7 +166,7 @@ class CommunityTests(unittest.TestCase):
 
     def test_real_pipeline_is_complete_and_csv_deterministic(self):
         from solution.pipeline import run_pipeline
-        data = Path("FINANCE-CASE/data")
+        data = Path("data")
         with tempfile.TemporaryDirectory() as tmp:
             first, second = Path(tmp) / "first", Path(tmp) / "second"
             report = run_pipeline(data, first)
