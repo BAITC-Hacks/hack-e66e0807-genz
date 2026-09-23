@@ -38,7 +38,7 @@ test('ranking and directed neighbor buttons use same selection',async()=>{
  expect(screen.getByRole('heading',{name:`Узел ${gid}`})).toBeVisible()
 })
 test('loading, fetch failure and retry have actionable distinct states',async()=>{
- vi.stubGlobal('fetch',vi.fn().mockRejectedValueOnce(new Error('offline')).mockResolvedValueOnce({ok:true,json:async()=>fixture}))
+ vi.stubGlobal('fetch',vi.fn().mockRejectedValueOnce(new Error('offline')).mockResolvedValueOnce({ok:true,json:async()=>fixture}).mockResolvedValue({ok:true,json:async()=>({status:'disabled',enabled:false})}))
  render(<App />)
  expect(screen.getByText('Загружаем граф и результаты анализа…')).toBeVisible()
  expect(await screen.findByRole('alert')).toHaveTextContent('Не удалось загрузить результаты анализа.')
@@ -71,6 +71,22 @@ test('CSV links and graph controls have accessible names',async()=>{
  expect(screen.getByRole('button',{name:'Кластеры'})).toHaveAttribute('aria-pressed','true')
  fireEvent.click(screen.getByRole('button',{name:'Приблизить'}))
  expect(screen.getByRole('img',{name:'Направленный граф выбранного узла'})).toBeVisible()
+})
+test('workspace navigation exposes actual aggregate transfers and adjacent evidence without invented dates',async()=>{
+ const other={...node,gid:'222',evidence:'Другой участник'}
+ vi.stubGlobal('fetch',vi.fn().mockResolvedValue({ok:true,json:async()=>({...fixture,nodes:[node,other],edges:[{src:gid,dst:'222',sum_kzt:12000,n_tx:3}]})}))
+ render(<App />)
+ await screen.findByLabelText('Поиск по gid')
+ fireEvent.click(screen.getByRole('button',{name:'Переводы'}))
+ fireEvent.click(screen.getByRole('button',{name:`Открыть связь ${gid} → 222`}))
+ expect(screen.getByLabelText('Данные выбранной связи')).toHaveTextContent('Переводов за период выгрузки: 3')
+ expect(screen.getByLabelText('Данные выбранной связи')).toHaveTextContent('Даты отдельных транзакций в этой таблице не переданы')
+ fireEvent.click(screen.getByRole('button',{name:'Закрыть данные связи'}))
+ expect(screen.queryByLabelText('Данные выбранной связи')).not.toBeInTheDocument()
+ fireEvent.click(screen.getByRole('button',{name:'Маршруты и возвраты'}))
+ expect(screen.getByText('В этом отчёте маршруты не рассчитаны.')).toBeVisible()
+ fireEvent.click(screen.getByRole('button',{name:'Устойчивость сети'}))
+ expect(screen.getByText('В этом отчёте устойчивость сети не рассчитана.')).toBeVisible()
 })
 test('selected node shows dated temporal evidence, incoming profile and ordered requests',async()=>{
  const temporal={incoming_tx_count:5,outgoing_tx_count:4,outgoing_after_1d_count:2,outgoing_after_1_or_2d_count:3,after_1_or_2d_examples:[{incoming_date:'2025-01-02',outgoing_date:'2025-01-03'},{incoming_date:'2025-01-02',outgoing_date:'2025-01-04'}],incoming_profile:{active_days:2,total_kzt:900,distinct_payers:3,median_kzt:150},synchronous_incoming:{date:'2025-01-02',distinct_payers:3,tx_count:4,sum_kzt:800},peak_day:{date:'2025-01-03',count:3,share:0.3,baseline_daily_count:0.5}}

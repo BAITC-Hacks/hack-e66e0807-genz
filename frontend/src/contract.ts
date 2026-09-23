@@ -1,3 +1,4 @@
+import { parseRoutes, parseResilience, parseAnomalies, type Routes, type Resilience, type Anomaly } from "./optional-contract"
 export const roles = { consolidator: 'Консолидация', transit: 'Транзит', distributor: 'Распределение', terminal: 'Конечный получатель', coordinator: 'Координация', peripheral: 'Периферия' } as const
 export type Role = keyof typeof roles
 export const roleColors: Record<Role,string> = {consolidator:'#2563eb',transit:'#0891b2',distributor:'#7c3aed',terminal:'#a16207',coordinator:'#be185d',peripheral:'#64748b'}
@@ -9,11 +10,11 @@ export interface TemporalEvidence {
  synchronous_incoming?:null|{date:string;distinct_payers:number;tx_count:number;sum_kzt:number};
  peak_day?:null|{date:string;count:number;share:number;baseline_daily_count:number};
 }
-export interface NodeRecord { gid:string; depth:number; is_seed:boolean; role:Role; role_score:number; cluster_id:number; priority_score:number; evidence:string; in_degree:number; out_degree:number; in_sum:number; out_sum:number; pass_through:number|null; boundary_censored:boolean; seed_ancestors:number; betweenness:number; warnings:string[]; temporal?:TemporalEvidence; next_data_requests?:string[] }
+export interface NodeRecord { gid:string; depth:number; is_seed:boolean; role:Role; role_score:number; cluster_id:number; priority_score:number; evidence:string; in_degree:number; out_degree:number; in_sum:number; out_sum:number; pass_through:number|null; boundary_censored:boolean; seed_ancestors:number; betweenness:number; warnings:string[]; temporal?:TemporalEvidence; next_data_requests?:string[]; anomalies?:Anomaly[] }
 export interface EdgeRecord {src:string;dst:string;sum_kzt:number;n_tx:number}
 export interface ClusterRecord {cluster_id:number;n_nodes:number;n_seed:number;sum_kzt_internal:number;top_gids:string[];hypothesis:string}
 export interface TopRecord {rank:number;gid:string;role:Role;priority_score:number;why:string}
-export interface Report {schema_version:'1.0';meta:{n_nodes:number;n_edges:number;n_transactions:number;n_seed:number;total_kzt:number;period_start:string;period_end:string;elapsed_seconds:number;warnings:string[]};nodes:NodeRecord[];edges:EdgeRecord[];clusters:ClusterRecord[];top_nodes:TopRecord[];has_invalid_optional?:boolean}
+export interface Report {schema_version:'1.0';meta:{n_nodes:number;n_edges:number;n_transactions:number;n_seed:number;total_kzt:number;period_start:string;period_end:string;elapsed_seconds:number;warnings:string[]};nodes:NodeRecord[];edges:EdgeRecord[];clusters:ClusterRecord[];top_nodes:TopRecord[];has_invalid_optional?:boolean; routes?:Routes; resilience?:Resilience}
 const object = (v:unknown):v is Record<string,unknown> => typeof v==='object' && v!==null && !Array.isArray(v)
 const strings = (v:unknown):v is string[] => Array.isArray(v)&&v.every(x=>typeof x==='string')
 const number = (v:unknown):v is number => typeof v==='number'&&Number.isFinite(v)
@@ -95,9 +96,13 @@ export function parseReport(value:unknown):Report {
     has_invalid_optional ||=clean.next_data_requests.length!==raw.next_data_requests.length
    } else {clean.next_data_requests=undefined;has_invalid_optional=true}
   }
+  if("anomalies" in raw){clean.anomalies=parseAnomalies(raw.anomalies,clean);has_invalid_optional ||= clean.anomalies===undefined}
   return clean
  })
- return {...value,nodes:parsedNodes,has_invalid_optional} as unknown as Report
+ const routes=value.routes===undefined?undefined:parseRoutes(value.routes,ids,edges as EdgeRecord[])
+ const resilience=value.resilience===undefined?undefined:parseResilience(value.resilience,{nodes:parsedNodes,top_nodes:top_nodes as TopRecord[]})
+ has_invalid_optional ||= (value.routes!==undefined&&!routes)||(value.resilience!==undefined&&!resilience)
+ return {...value,nodes:parsedNodes,routes,resilience,has_invalid_optional} as unknown as Report
 }
 export const count = (n:number) => new Intl.NumberFormat('ru-RU',{maximumFractionDigits:0}).format(n)
-export const money = (n:number) => `${count(n)} ₸`
+export const money = (n:number) => `${new Intl.NumberFormat('ru-RU',{maximumFractionDigits:2}).format(n)} ₸`

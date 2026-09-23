@@ -60,6 +60,7 @@ try {
  assert(await page.getByRole('heading',{name:'Как устроен анализ'}).isVisible(),'method explanation is accessible')
  assert((await page.locator('.methodology').innerText()).includes('Данные →'),'analysis flow is explained')
  await page.locator('.header-menu > summary').filter({hasText:'Как читать анализ'}).click()
+ if(await page.locator('.mobile-queue-toggle').isVisible()&&await page.locator('.mobile-queue-toggle').getAttribute('aria-expanded')==='false')await page.locator('.mobile-queue-toggle').click()
  await page.getByRole('button',{name:'Вся выборка',exact:true}).click()
  assert.equal(await page.getByRole('button',{name:/^Открыть узел \d+$/}).count(),Math.min(20,report.nodes.length),'initial exploration is paged')
  if(report.nodes.length>20){await page.getByRole('button',{name:'Показать ещё'}).click();assert.equal(await page.getByRole('button',{name:/^Открыть узел \d+$/}).count(),40,'more reveals twenty rows')}
@@ -130,6 +131,7 @@ try {
   assert.equal(await page.locator('.mobile-selected strong').innerText(),mobileId,'mobile selection updates graph context')
  }
  await search(report.top_nodes[0].gid)
+ if(await page.locator('.mobile-queue-toggle').isVisible()&&await page.locator('.mobile-queue-toggle').getAttribute('aria-expanded')==='false')await page.locator('.mobile-queue-toggle').click()
  await page.getByRole('button',{name:'Вся выборка',exact:true}).click()
  await choose('Граница выгрузки','Граничные')
  assert((await page.getByRole('combobox',{name:'Граница выгрузки'}).textContent()).includes('Граничные'),'mobile select is usable')

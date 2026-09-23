@@ -15,7 +15,7 @@ test('directional lanes preserve arrows, amount evidence and independent access 
  expect(screen.getAllByText('Отправители').length).toBeGreaterThan(0)
  expect(screen.getByText('Получатели')).toBeVisible()
  expect(screen.getByText('Показано 12 из 14 связей. Суммы за весь период, KZT.')).toBeVisible()
- const paths=container.querySelectorAll('.graph-edge path')
+ const paths=container.querySelectorAll('.graph-edge path[marker-end]')
  expect(paths).toHaveLength(12)
  paths.forEach(p=>expect(p).toHaveAttribute('marker-end','url(#flow-arrow)'))
  expect(container.querySelectorAll('.svg-amount')).toHaveLength(12)
