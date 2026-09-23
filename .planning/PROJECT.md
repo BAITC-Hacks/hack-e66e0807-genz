@@ -24,6 +24,7 @@ An analyst can identify which client to review first and explain why using obser
 - [ ] `top_nodes.csv` lists at least 20 nodes in descending investigation priority with an evidence-based `why` value.
 - [ ] The viewer shows directed flows, role and cluster distinctions, and search by `gid` with the selected node's connections, suitable for a live five-minute demonstration.
 - [ ] The repository README explains the single-command run, role rules and thresholds, output files, analytical limits, and how the approach would change near one million nodes; a simple data-to-decision diagram and demo walkthrough are available.
+- [ ] Analyst-facing descriptions and submission explanations are written in Russian, while required CSV column names, role codes, `gid`, and other technical terms retain their canonical spelling.
 
 ### Out of Scope
 
@@ -48,6 +49,7 @@ An analyst can identify which client to review first and explain why using obser
 - **Data scope**: synthetic `gid` values and observed transactions only — no external enrichment or invented personal attributes.
 - **Interpretation**: roles, clusters, and priorities are hypotheses for review — sampling bias and missing ground truth prevent definitive conclusions.
 - **Compatibility**: preserve the fixed required CSV schemas and all 2,248 nodes — the judges check them mechanically.
+- **Language**: write analyst-facing narrative text in Russian without mechanically translating technical terms — requested for the demo and deliverables.
 
 ## Key Decisions
 
@@ -58,6 +60,7 @@ An analyst can identify which client to review first and explain why using obser
 | Prioritize all five mandatory case functions before optional analysis | Missing any one can fail the submission | — Pending |
 | Use deterministic, documented role and priority rules | Arbitrary `gid`s must be explainable to an analyst and judge | — Pending |
 | Handle depth-4 censoring and incomplete seed inflow explicitly | Naive terminal and pass-through labels would be misleading | — Pending |
+| Use Russian for analyst-facing descriptions, retaining technical identifiers | Matches the requested presentation language without breaking fixed schemas | — Pending |
 
 ## Evolution
 
