@@ -1,0 +1,3 @@
+# Phase 7 UI extension
+
+Assistant is an optional disclosure beside the evidence card, closed by default and absent from the primary graph. When unavailable, show a one-line local configuration state without breaking the workbench. Enabled state has a question input, selected gid context, bounded loading state, answer, distinct observation/interpretation/unknown labels, clickable validated gid citations, limitations and retry. A response without valid evidence displays inability to answer; never render report/model text as HTML. Responsive layout preserves priority and graph prominence, accessible focus/labels, and does not duplicate the existing node card.

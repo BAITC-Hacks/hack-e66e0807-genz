@@ -1,0 +1,3 @@
+# Phase 4 UI extension
+
+Place “Маршруты и возвраты” in selected-account evidence, below primary role/flow evidence. Show directed A→B→C or closed cycle as text plus arrow icons, each leg's aggregate KZT and transaction count, and date examples separately labeled “наблюдаемый порядок дат”. Every gid is a keyboard-accessible navigation control. A capped result exposes count and “показаны первые 20” with truncation. Empty, unavailable-old-report and malformed-optional states differ. Keep the Phase 3 desktop/mobile graph and first-screen hierarchy. Add no permanent canvas clutter or new role colors.
