@@ -52,7 +52,7 @@
 - [ ] **UX-02**: Graph identifies incoming/outgoing direction and amounts, has readable node identity/role and explicit dense-neighborhood scope.
 - [ ] **UX-03**: Desktop and mobile screenshots plus analyst browser journey independently checked; all original UI functions preserved.
 
-### Planned optional enhancements (execution hold)
+### Optional enhancements in implementation
 
 - [ ] **ROUTE-01**: Enumerate bounded deterministic directed A→B→C paths and 2–3-node return cycles with aggregate leg evidence and string gid references.
 - [ ] **ROUTE-02**: Distinguish topology, strictly ordered dates, ambiguous same-day observations and recurrence across distinct episode-start days; disclose that dates cannot trace the same money.
@@ -91,18 +91,18 @@
 | UX-01 | Phase 3 | Technical checks passed; user visual review open |
 | UX-02 | Phase 3 | Technical checks passed; user visual review open |
 | UX-03 | Phase 3 | Technical checks passed; user visual review open |
-| ROUTE-01 | Phase 4 | Plan reviewed; execution held |
-| ROUTE-02 | Phase 4 | Plan reviewed; execution held |
-| ROUTE-03 | Phase 4 | Plan reviewed; execution held |
-| RES-01 | Phase 5 | Plan reviewed; execution held |
-| RES-02 | Phase 5 | Plan reviewed; execution held |
-| RES-03 | Phase 5 | Plan reviewed; execution held |
-| ANOM-01 | Phase 6 | Plan reviewed; execution held |
-| ANOM-02 | Phase 6 | Plan reviewed; execution held |
-| ANOM-03 | Phase 6 | Plan reviewed; execution held |
-| AI-01 | Phase 7 | Plan reviewed; execution held |
-| AI-02 | Phase 7 | Plan reviewed; execution held |
-| AI-03 | Phase 7 | Plan reviewed; execution held |
-| AI-04 | Phase 7 | Plan reviewed; execution held |
+| ROUTE-01 | Phase 4 | In progress |
+| ROUTE-02 | Phase 4 | In progress |
+| ROUTE-03 | Phase 4 | In progress |
+| RES-01 | Phase 5 | In progress |
+| RES-02 | Phase 5 | In progress |
+| RES-03 | Phase 5 | In progress |
+| ANOM-01 | Phase 6 | In progress |
+| ANOM-02 | Phase 6 | In progress |
+| ANOM-03 | Phase 6 | In progress |
+| AI-01 | Phase 7 | In progress |
+| AI-02 | Phase 7 | In progress |
+| AI-03 | Phase 7 | In progress |
+| AI-04 | Phase 7 | In progress |
 
-All 33 requirement IDs map to a single active phase. UI-04 moved from Phase 1 to Phase 3 after the readability rejection. AI-01 is planned in Phase 7; its earlier implementation deferral remains in force.
+All 33 requirement IDs map to a single active phase. UI-04 moved from Phase 1 to Phase 3 after the readability rejection. AI-01 is planned in Phase 7; the later user request authorizes its implementation and a real-model verification gate.

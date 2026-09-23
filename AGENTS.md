@@ -51,6 +51,8 @@ No project skills found. Add skills to any of: `.claude/skills/`, `.agents/skill
 
 ## GSD Workflow Enforcement
 
+Delivery loop: the latest user request authorizes implementation of phases4–7 and a Mercury-reference UI redesign. Earlier planning-only holds are superseded. Prefer bounded implementation/test/repair cycles over extra planning ceremony; README must track verified behavior, and real LLM inference is required to claim AI completion.
+
 Hackathon delivery: commit each completed small task promptly and immediately push to origin/main (explicit user authorization). Parallel agents notify the parent with exact ready file paths; the parent serializes git operations. User explicitly authorized autonomous GSD loops, parallel work after shared contracts, and repair/retest when acceptance criteria fail. Do not wait for an entire phase before committing.
 
 Context continuity: after each phase write SUMMARY and VERIFICATION evidence, update STATE/ROADMAP/REQUIREMENTS, then reread STATE.md and ROADMAP.md before selecting the next phase. Before context compaction record active agents, ownership, pending checks, server sessions, latest commit/push and exact next action in .planning/STATE.md. Refresh this AGENTS.md when workflow or stable project conventions change. Never infer passing checks from an old summary after code changes.

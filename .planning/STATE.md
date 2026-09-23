@@ -1,72 +1,62 @@
 ---
 gsd_state_version: "1.0"
-current_phase: 3
-current_phase_name: Понятное рабочее место AML-аналитика
-current_plan: 2
-status: Verifying — technical UI checks passed; user visual review open
-last_updated: "2026-09-23T12:17:38.761Z"
+current_phase: 4
+current_phase_name: Дополнительная аналитика и Mercury UI
+status: executing
+last_updated: "2026-09-23T12:21:13.088150+00:00"
 last_activity: 2026-09-23
-last_activity_desc: All nine improvement plans reviewed; execution held
-state_head: ce3664b3b9edaa2c4294fe157362066f325de56d
+last_activity_desc: User authorized full implementation; analytics, Mercury UI and AI executors running
 progress:
   total_phases: 7
   completed_phases: 2
   total_plans: 17
   completed_plans: 8
   percent: 29
-stopped_at: UI technical verification complete; future plans reviewed; no feature implementation running
 ---
 
 # Project State
 
 ## Current Position
 
-Phase: 3 of 7 (Понятное рабочее место AML-аналитика)
-Current Phase: 3
-Current Phase Name: Понятное рабочее место AML-аналитика
-Status: Verifying — technical UI checks passed; user visual review open
-Current Plan: 2
+Current Phase: 4
+Current Phase Name: Дополнительная аналитика и Mercury UI
+Current Plan: 1
 Total Plans in Phase: 2
+Status: Executing
 Last Activity: 2026-09-23
-Last Activity Description: All nine improvement plans reviewed; execution held
 
-Phase 3 implementation and its two plans are complete. Independent final verification records 5/5 technical truths; user visual acceptance remains open after the earlier readability rejection. Phase 2 has three completed plans and passing technical evidence; Phase 2 was administratively closed through GSD phase.complete after refreshed verification. Phase 1 is closed.
+Phases1–2 technically complete. Previous Phase3 UI passed29frontend/26Python/24browser checks but user explicitly requested a new Mercury-based redesign; UI acceptance is reopened. Phases4–7 have nine independently reviewed plans (0blockers/warnings;19/19 decisions;13/13requirements) and ARE NOW AUTHORIZED FOR IMPLEMENTATION. Earlier planning-only hold is superseded by latest user message demanding finished working features and README updates.
 
-Eight implementation plans exist across phases 1–3. Future phases 4–7 have nine reviewed plans; 8/17 total plans have been implemented. Phase completion is 2/7 (29%); Phase 3 visual review remains open. Completed-plan count does not imply seven phases are complete.
+## Final Goal and Loop
 
-## Decisions and Scope
+Deliver a reproducible working local AML project meeting all five case must-haves and its eight optional directions, with clear Mercury-inspired UI. Short loop: implement → actual semantic/browser tests → compare against case/user criteria → repair/retest. Keep GSD context and evidence current without unnecessary process overhead. No fake AI, canned results, invented attributes or hidden limitations. README describes only actually implemented and verified behavior. Frequent small commits immediately pushed by root.
 
-- Preserve all five case must-haves, exact three CSV schemas, string JSON gids, offline local operation and explainable hypotheses.
-- Four optional features already exist: boundary handling, temporal observations, node card, limitation-specific next-data requests.
-- Latest user instruction “спланируй все”: plan routes/cycles, resilience, anomalies and grounded AI as phases 4–7. This is planning only; do not auto-execute those phases despite auto_advance configuration.
-- UI uses DESIGN.md: refined industrial analyst workspace, local fonts, directed lanes, mobile flow list and original calculation evidence behind readable explanations.
-- GSD remains the orchestrator. Root serializes small commits and immediately pushes; user already authorized this.
+## Active Agents and Ownership
 
-## Current Evidence
+- implement_optional_analytics (gpt-6-sol high): solution/routes.py,resilience.py,anomalies.py,pipeline.py; newanalytics tests and scripts/verify_extensions.py. Implements phases4–6 exact frozen contract, preserves CSVvalues andexisting scores.
+- implement_optional_ui (gpt-6-astra high): frontend/ except root-owned vite.config.ts; DESIGN.md and Phase3 Mercury workflow artifacts. Must inspect actual https://demo.mercury.com/dashboard first; unifytokens, preserveallfeatures, integrateoptionaldata, browserwide/narrowscreenshots.
+- implement_ai_assistant (gpt-6-sol high): solution/assistant.py,server.py,tests/test_assistant.py,scripts/verify_assistant_live.py and minimal ignoredlocalmodelsetup ifneeded. No ollama/llama-server or API-key environment names found at initialprobe; agent investigates genuine localCPU model, reportsblockerspromptly. AI is not accepted withmocksonly.
+- Root: publiccontract/README/architecture/methodology/demo, run.py/integrationvalidation asneeded, sharedSTATE/ROADMAP/REQUIREMENTS/AGENTS, outputregeneration, independentreview and serializedgit.
 
-- Final polished UI: 29 frontend tests, production build and 24 real-data browser checks pass.
-- Independent Python suite: 26 tests pass. Latest measured full CLI calculations: 0.618 and 0.567 seconds.
-- Desktop, 390px and 304px screenshots inspected by root/executor/verifier; no horizontal page overflow. Narrow placeholder truncation and long mobile document are known minor limits; inspector anchor provides direct access.
-- Original CSV values and analytical semantics unchanged by UI redesign. No external runtime requests in the production browser checks.
-- Fresh dependency directories from a source archive passed launcher --check in 16.51 seconds using caches; this is not a clean OS VM test.
+## Interfaces
 
-## Live Handoff
+Frozen schemas: docs/DATA-CONTRACT.md Additive extension contract (copied from reviewed04contract beforeimplementation). Old reports withoutoptionalfieldsremainvalid. AllJSONgid strings; originalthreeCSVschemasandvaluesunchanged. Analytics/frontendedits followthiscontract. AIcommonrecipient totals are computedserver-side fromcompleteedgeevidence, notmodelnumbers.
 
-- astra_ui_redesign_resumed: finished source/design and 03-01-SUMMARY; polish 0cb3089, integration153fdd2 and verification ce3664b pushed to origin/main.
-- gsd_verify_recovery: finished current Phase1/2/3 verification reports. Phase1/2 technical acceptance current; Phase3 needs user visual review. No source changes pending.
-- gsd_plan_all_improvements and gsd_check_improvement_plans: finished nine plans and independent PASS with 0 blockers/warnings, including final common-recipient citation consistency amendment. Root owns all shared files.
-- Root owns STATE/PROJECT/AGENTS, integration summary, runtime config, final review and all git operations.
-- Live Vite preview: http://127.0.0.1:8000/ (exec session57933); data backend port8765 (session99919). UI changes refresh automatically. A new in-app browser tab was opened and marked deliverable.
-- Prepared .venv, frontend/node_modules, Chrome153 and /tmp/money-graph-browsers. Loopback checks require permitted execution in this environment.
-- Screenshots: /tmp/money-graph-desktop-phase3.png, /tmp/money-graph-mobile-phase3.png, /tmp/money-graph-mobile-304-phase3.png.
-- Next: user can review the live UI; Phase3 visual acceptance remains open. Future implementation starts only on a subsequent execution request. Plans4–7 are ready, not executed; independent review PASS.
+## Runtime and Git
 
-## Session Continuity
+- Vite live UI http://127.0.0.1:8000/, session57933. Data/backendserver8765 session99919. Root restartbackendafterassistantserverchanges, preserveliveUI.
+- Baselineproductiondist built; currentHMRsource updatesautomatically. Python .venv, frontendnode_modules, Chromium /tmp/money-graph-browsers available; loopbackneedspermittedexec.
+- Latest confirmed push fe36035 (allnineplans). UIpolish0cb3089, integration153fdd2, verificationce3664b previouslypushed.
+- Previous screenshots /tmp/money-graph-desktop-phase3.png, mobile-phase3.png, mobile-304-phase3.png are historical; newMercuryscreenshotsrequired.
 
-Original MVP deadline was 2026-09-23 11:47 UTC; additional redesign/planning continued by user request. After each phase reread this STATE and ROADMAP. Preserve running preview servers and do not rerun completed work without new changes or unresolved concerns.
+## Exact Next Actions
 
-## Planning Completion
+1. Commit updated authorization+public contract and push.
+2. Continue independent integration/docs work; agents deliver small tested filegroups forrootcommits.
+3. Recalculateoutputwhenanalyticsready, preserveCSVbaseline, integrateAIliveprovider, restartbackend.
+4. Runallrelevanttests, independentdataoracle and browserjourney; inspectMercurycomparison desktop/narrow; fixfailures.
+5. UpdateREADMEonlyafterverifiedbehavior, finalcase8optional+5mandatorymatrix, STATE/ROADMAP/evidence; commit/push.
 
-All nine phase4–7 plans passed independent semantic review and structural checks. Decision coverage19/19; requirement coverage13/13. GSD state.planned-phase and roadmap.annotate-dependencies executed for each phase. Active context restored to Phase3 visual review; no automatic execution follows this planning-only request. All agents are finished.
+## Constraints and Continuity
 
-Runtime note: installed GSD state.sync rederived the active plan count as3 and left state.json next atPhase7 after multi-phase planning; root reconciled both to actual Phase3 (two plans) and the explicit future execution hold.
+Synthetic organizerdataset; originalparquetunchanged. 2248nodes3119edges4840tx19isolates. Depth4notterminalproof;seedincomingincomplete; nofundidentityclaimfromdates; hypothesesnotguilt. Fullbatch<300s. Initialone-hourMVPwindowended11:47UTC; userrequestedadditionalworkafterwards. Beforecompactionkeepownership,server sessions,checks,nextactionupdated; afterphase rereadSTATE/ROADMAP.
