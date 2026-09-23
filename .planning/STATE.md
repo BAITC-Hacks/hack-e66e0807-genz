@@ -1,7 +1,7 @@
 ---
 gsd_state_version: "1.0"
-current_phase: 2
-current_phase_name: Временные паттерны и углублённая проверка
+current_phase: 3
+current_phase_name: Понятное рабочее место AML-аналитика
 status: executing
 stopped_at: Phase2 contracts and plans in progress; Phase1 accepted
 last_updated: "2026-09-23T11:20:02.732Z"
@@ -9,7 +9,7 @@ last_activity: 2026-09-23
 last_activity_desc: Phase 2 execution started
 state_head: 54bc9c9256de809b42ba63de8f437f2e1c543eef
 progress:
-  total_phases: 2
+  total_phases: 3
   completed_phases: 1
   total_plans: 6
   completed_plans: 3
@@ -23,7 +23,7 @@ progress:
 See: .planning/PROJECT.md (updated 2026-09-23)
 
 **Core value:** Аналитик видит, кого проверять первым и почему, и может найти любой gid и исследовать его связи.
-**Current focus:** Phase 2 — Временные паттерны и углублённая проверка
+**Current focus:** Phase 3 — Понятное рабочее место AML-аналитика
 
 ## Current Position
 
@@ -89,12 +89,13 @@ Stopped at: Phase2 contracts and plans in progress; Phase1 accepted
 
 ## Live Handoff
 
-- Active agent: gsd_verify_phase1 owns01-VERIFICATION.md. Other implementation agents finished.
-- Report+3CSV ready;2248nodes,3119edges,4840transactions,91clusters,50priorities.
-- Production server http://127.0.0.1:8000 session35637; auxiliary8765 session9058. CUA appTab points to8000.
-- Browser executable cache /tmp/money-graph-browsers. Full acceptance: PLAYWRIGHT_BROWSERS_PATH=/tmp/money-graph-browsers .venv/bin/python scripts/verify_delivery.py --data FINANCE-CASE/data --out output --browser (requires sandbox socket escalation).
-- Parent serializes git commit/push to origin/main. Latest confirmed pushed b4b51ba; Phase1 acceptance next commit.
-- Next: Phase2 discuss/plan/check/execute/verify. Phase1 phase.complete succeeded and state/roadmap reread. Deadline11:47UTC.
+- Latest request: user rejected graph/UI clarity. Phase 3 added through GSD phase.add; UI usability acceptance is reopened.
+- Active executor: astra_ui_redesign (gpt-6-astra, high), owns frontend and Phase 3 UI-SPEC/03-01-PLAN/SUMMARY. Parent owns integration checks, docs, STATE/ROADMAP and git.
+- Phase 2 functional checks: Python 26, frontend 16, browser 18 PASS; independent temporal recomputation PASS, CSV unchanged. This does not imply visual acceptance.
+- Phase 2 summaries and verification are ready; administrative closure pending. Latest confirmed push 78092de.
+- Product server http://127.0.0.1:8000; build frontend/dist to update. Prepared Python .venv and Chromium /tmp/money-graph-browsers.
+- Next: check Astra plan and UI-SPEC, implement, inspect real desktop/mobile graph, repair, verify, commit and push small increments.
+- AI assistant remains deferred by user.
 
-## Current acceptance correction
-User rejected README clarity; Phase2 plan03 now explicitly includes run.py one-command launch, judging-oriented README/AGENTS and demo. Root run.py --skip-install --check PASS with actual data+HTTP. Frontend enhancements11tests+18browserchecksPASS; independent final review remains. Phase1 implementation complete, final documentation acceptance pending. Backend02-01complete25Python tests; source recomputation PASS297temporalnodes,38sync,265peak,444boundaryprofiles,CSVunchanged. Active: frontend summary, jury docs; root launch/docs integration.
+### Roadmap Evolution
+- Phase 3 added: Понятное рабочее место AML-аналитика. Explicit user-requested redesign after functional verification.

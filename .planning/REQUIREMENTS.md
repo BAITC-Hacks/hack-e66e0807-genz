@@ -24,7 +24,7 @@
 - [x] **UI-01**: Локальный интерфейс на shadcn/ui показывает направленный граф, роли и кластеры с легендой.
 - [x] **UI-02**: Поиск любого gid открывает его карточку и связи, включая граничные узлы и изоляты; топ-лист связан с графом.
 - [x] **UI-03**: Аналитик скачивает три CSV фиксированных схем; видит понятные загрузку, ошибку, пустые результаты и ограничения данных.
-- [x] **UI-04**: Интерфейс минималистичен, читаем, доступен клавиатурой и адаптируется к узкому экрану; локальная сборка не зависит от CDN.
+- [ ] **UI-04**: Интерфейс минималистичен, читаем, доступен клавиатурой и адаптируется к узкому экрану; локальная сборка не зависит от CDN.
 
 ### Delivery
 
@@ -61,12 +61,12 @@
 | UI-01 | Phase 1 | Complete |
 | UI-02 | Phase 1 | Complete |
 | UI-03 | Phase 1 | Complete |
-| UI-04 | Phase 1 | Complete |
+| UI-04 | Phase 3 | Reopened after user feedback |
 | SHIP-01 | Phase 1 | Complete |
 | SHIP-02 | Phase 1 | Complete |
 | TEST-01 | Phase 1 | Complete |
 
-Coverage: 15/15 v1 requirements mapped; каждый ровно в одной фазе, без пропусков.
+Coverage: 15/15 v1 requirements mapped; UI-04 transferred to Phase 3 after user rejected readability. Original functional evidence for UI-01–03 is retained and must regress successfully.
 
 ### v2 Traceability
 
@@ -75,3 +75,15 @@ Coverage: 15/15 v1 requirements mapped; каждый ровно в одной ф
 | TIME-01 | Phase 2 | Pending |
 | EXPL-01 | Phase 2 | Pending |
 | AI-01 | За пределами текущего roadmap | Deferred |
+
+### Redesign acceptance
+
+- [ ] **UX-01**: Priority → graph → evidence workflow is visible and understandable on the first desktop screen.
+- [ ] **UX-02**: Graph identifies incoming/outgoing direction and amounts, has readable node identity/role and explicit dense-neighborhood scope.
+- [ ] **UX-03**: Desktop and mobile screenshots plus analyst browser journey independently checked; all original UI functions preserved.
+
+| Requirement | Phase | Status |
+|-------------|-------|--------|
+| UX-01 | Phase 3 | Pending |
+| UX-02 | Phase 3 | Pending |
+| UX-03 | Phase 3 | Pending |
