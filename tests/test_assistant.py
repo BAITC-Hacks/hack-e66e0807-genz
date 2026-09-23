@@ -19,7 +19,8 @@ def fixture_report():
     gids = SOURCES + [RECIPIENT, RIVAL]
     nodes = [{"gid": gid, "depth": 4 if gid == RECIPIENT else 0,
               "role": "peripheral", "priority_score": 0.1, "in_sum": 0.0,
-              "out_sum": 0.0, "cluster_id": 0, "evidence": "untrusted text",
+              "out_sum": 0.0, "in_degree": 0, "out_degree": 0,
+              "cluster_id": 0, "evidence": "untrusted text",
               "boundary_censored": gid == RECIPIENT, "is_seed": gid in SOURCES}
              for gid in gids]
     edges = [{"src": gid, "dst": RECIPIENT, "sum_kzt": float(10000 + i * 1000), "n_tx": 1}
@@ -93,9 +94,9 @@ class QueryTests(unittest.TestCase):
         config = AssistantConfig(True, "http://127.0.0.1:1234", "test", "", "local")
         answer = answer_question(fixture_report(), "Почему этот участник в приоритетах?",
                                  RECIPIENT, config, provider)
-        self.assertEqual(len(answer["citations"]), 2)
+        self.assertEqual(len(answer["citations"]), 6)
         self.assertIn("эвристический приоритет", answer["answer"])
-        self.assertEqual(len(seen), 2)
+        self.assertEqual(len(seen), 1)
 
     def test_free_openrouter_config_and_missing_key(self):
         from solution.assistant import AssistantConfig
@@ -108,6 +109,36 @@ class QueryTests(unittest.TestCase):
                 self.assertEqual(config.model, "openrouter/free")
                 self.assertEqual(config.provider, "remote")
                 self.assertEqual(config.status()["status"], "ready")
+
+    def test_model_json_wrapping_is_discarded_but_ambiguous_or_prose_only_refused(self):
+        from solution.assistant import AssistantEvidenceError, _structured_payload
+        wrapped = 'Result:\n```json\n{"recipient_gid":"' + RECIPIENT + '"}\n```'
+        self.assertEqual(_structured_payload(wrapped, True), {"recipient_gid": RECIPIENT})
+        nested = 'Here: {"claims":[{"reference":"node/' + RECIPIENT + '/role","value":"peripheral"}]}'
+        self.assertEqual(len(_structured_payload(nested, False)["claims"]), 1)
+        with self.assertRaises(AssistantEvidenceError):
+            _structured_payload("The recipient is obvious.", True)
+        with self.assertRaises(AssistantEvidenceError):
+            _structured_payload('{"recipient_gid":"' + RECIPIENT + '"}{"recipient_gid":"' + RIVAL + '"}', True)
+
+    def test_priority_method_question_requires_real_tool_call_and_cites_example(self):
+        from solution.assistant import AssistantConfig, AssistantEvidenceError, answer_question
+        config = AssistantConfig(True, "http://127.0.0.1:1234", "test", "", "local")
+        seen = []
+
+        def provider(_config, _messages, specs, _timeout, _choice):
+            seen.extend(spec["function"]["name"] for spec in specs)
+            return {"role": "assistant", "tool_calls": [{"id": "method-1", "function": {
+                "name": "get_priority_method", "arguments": "{}"}}]}
+
+        answer = answer_question(fixture_report(), "Как отбираются участники для приоритета?",
+                                 config=config, provider_call=provider)
+        self.assertIn("0.30", answer["answer"])
+        self.assertEqual(answer["citations"][0]["reference"], f"node/{RECIPIENT}/priority_score")
+        self.assertIn("get_priority_method", seen)
+        with self.assertRaises(AssistantEvidenceError):
+            answer_question(fixture_report(), "Как отбираются участники для приоритета?",
+                            config=config, provider_call=lambda *_: {"role": "assistant", "content": "guess"})
 
 
 class ApiTests(unittest.TestCase):

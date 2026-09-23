@@ -29,8 +29,10 @@ def make_server(data_dir, ui_dir, port=8000):
     if assistant_config.enabled:
         try:
             assistant_report = json.loads((data_root / "report.json").read_text(encoding="utf-8"))
-        except (OSError, ValueError) as exc:
-            raise ValueError("Assistant cannot read report.json") from exc
+        except (OSError, ValueError):
+            # Optional AI must never prevent the ordinary report/CSV UI from
+            # being served, even when its snapshot cannot be decoded.
+            assistant_report = None
 
     class Handler(SimpleHTTPRequestHandler):
         def _assistant_json(self, code, payload):
@@ -53,7 +55,10 @@ def make_server(data_dir, ui_dir, port=8000):
                 if not self._assistant_host_allowed():
                     self._assistant_json(403, {"status": "invalid_request", "error": "Invalid host"})
                     return
-                self._assistant_json(200, assistant_config.status())
+                status = assistant_config.status()
+                if status["status"] == "ready" and assistant_report is None:
+                    status = {**status, "status": "unavailable", "message": "Отчёт недоступен ассистенту."}
+                self._assistant_json(200, status)
                 return
             super().do_GET()
 
@@ -74,6 +79,9 @@ def make_server(data_dir, ui_dir, port=8000):
                 return
             if not assistant_config.status()["configured"]:
                 self._assistant_json(503, {"status": "unavailable", "error": "Assistant is not configured"})
+                return
+            if assistant_report is None:
+                self._assistant_json(503, {"status": "unavailable", "error": "Assistant report unavailable"})
                 return
             if self.headers.get("Content-Type", "").split(";", 1)[0].strip().lower() != "application/json":
                 self._assistant_json(415, {"status": "invalid_request", "error": "JSON required"})
