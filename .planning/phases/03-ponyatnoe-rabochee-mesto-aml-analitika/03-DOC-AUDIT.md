@@ -25,4 +25,8 @@
 | Local operation | Loopback server, local fonts/assets; package installation is a prerequisite requiring network/cache |
 | Million-node discussion | README and ARCHITECTURE distinguish future compact graph/server pagination from current full in-memory snapshot |
 
-Functional evidence does not close UI readability. Phase 3 browser and screenshot checks remain pending until the redesign builds.
+Final redesigned UI passed 24 real-data browser checks and desktop/390px/304px screenshot inspection after reboot. This is agent-observed readability evidence; user usability acceptance remains open.
+
+## Isolated launch evidence
+
+From git archive at 2259e0f, a new temporary directory without .venv/node_modules ran `python3 run.py --data <organizer data> --check`: PASS in 16.51 seconds using package caches. It created 2248 nodes, 3119 edges and 4840 transactions; CLI timings 0.616/0.566 seconds; deterministic exports, HTTP and independent temporal checks passed. This is not a clean operating-system VM test. Later font-only dependency changes require production build and installed package validation.

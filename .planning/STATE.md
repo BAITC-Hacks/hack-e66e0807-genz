@@ -2,100 +2,53 @@
 gsd_state_version: "1.0"
 current_phase: 3
 current_phase_name: Понятное рабочее место AML-аналитика
-status: executing
-stopped_at: Phase2 contracts and plans in progress; Phase1 accepted
-last_updated: "2026-09-23T11:20:02.732Z"
+status: verifying
+stopped_at: UI implementation complete; independent reports and future phase planning in progress
+last_updated: "2026-09-23T12:06:39.303505+00:00"
 last_activity: 2026-09-23
-last_activity_desc: Phase 2 execution started
-state_head: 54bc9c9256de809b42ba63de8f437f2e1c543eef
+last_activity_desc: Recovered agents and live preview; final UI checks passed; planning all optional improvements
 progress:
-  total_phases: 3
+  total_phases: 7
   completed_phases: 1
-  total_plans: 6
-  completed_plans: 3
-  percent: 50
+  total_plans: 8
+  completed_plans: 8
 ---
 
 # Project State
 
-## Project Reference
-
-See: .planning/PROJECT.md (updated 2026-09-23)
-
-**Core value:** Аналитик видит, кого проверять первым и почему, и может найти любой gid и исследовать его связи.
-**Current focus:** Phase 3 — Понятное рабочее место AML-аналитика
-
 ## Current Position
 
-Phase: 2 (Временные паттерны и углублённая проверка) — EXECUTING
-Plan: 1 of 3
-Status: Executing Phase 2
-Last activity: 2026-09-23 — Phase 2 execution started
+Phase 3 implementation and its two plans are complete. Independent final verification is being recorded; user visual acceptance remains open after the earlier readability rejection. Phase 2 has three completed plans and passing technical evidence; administrative closure awaits refreshed verification. Phase 1 is closed.
 
-Progress: [█████░░░░░] 50% of roadmap; Phase1 accepted5/5
+Eight implementation plans exist across phases 1–3. Future phases 4–7 are being planned and are not included in this implementation count yet. Completed-plan count does not imply seven phases are complete.
 
-## Performance Metrics
+## Decisions and Scope
 
-**Velocity:**
+- Preserve all five case must-haves, exact three CSV schemas, string JSON gids, offline local operation and explainable hypotheses.
+- Four optional features already exist: boundary handling, temporal observations, node card, limitation-specific next-data requests.
+- Latest user instruction “спланируй все”: plan routes/cycles, resilience, anomalies and grounded AI as phases 4–7. This is planning only; do not auto-execute those phases despite auto_advance configuration.
+- UI uses DESIGN.md: refined industrial analyst workspace, local fonts, directed lanes, mobile flow list and original calculation evidence behind readable explanations.
+- GSD remains the orchestrator. Root serializes small commits and immediately pushes; user already authorized this.
 
-- Total plans completed: 3
-- Average duration: —
-- Total execution time: 0 hours
+## Current Evidence
 
-**By Phase:**
-
-| Phase | Plans | Total | Avg/Plan |
-|-------|-------|-------|----------|
-| 1 | 3 | - | - |
-| 2 | 0 | — | — |
-
-**Recent Trend:**
-
-- Last 5 plans: Нет завершённых планов.
-- Trend: Нет данных.
-
-## Accumulated Context
-
-### Decisions
-
-Decisions are logged in PROJECT.md Key Decisions table.
-Recent decisions affecting current work:
-
-- PROJECT_MODE=mvp: сначала полный сдаваемый MVP, затем улучшения; отсчёт часового лимита — 2026-09-23 10:47 UTC.
-- Phase 1: общий версионированный JSON/CSV-контракт и пример данных до параллельной реализации Python analytics и shadcn UI; gid в браузере строковый.
-- Phase 1: сохранить все узлы; учитывать обрыв depth=4, seed и неполноту входящих; формулировать только гипотезы.
-- Phase 1: закрытие после реального измеренного прогона, проверок и исправления пробелов; размеры данных подтверждены: 2248 узлов, 3119 рёбер, 4840 транзакций, 19 изолятов, 35 компонент.
-- Phase 2: TIME-01 и EXPL-01 после MVP; AI-01 отложен.
-- Автономные GSD-циклы и параллельные субагенты разрешены пользователем; дальнейшие решения в согласованном объёме не требуют повторного подтверждения.
-
-### Pending Todos
-
-Нет отдельных задач вне roadmap.
-
-### Blockers/Concerns
-
-No known product blockers. CR-01 cluster-purpose gap repaired and regression tested; independent verification PASS5/5. MVP story formatting normalized with user-story.validate PASS without changing scope.
-
-## Deferred Items
-
-AI-01 remains outside current roadmap.
-
-## Session Continuity
-
-**Resume file:** .planning/phases/02-vremennye-patterny-i-uglublennaya-proverka/02-CONTEXT.md
-
-Last session: 2026-09-23T11:15:22.941Z
-Stopped at: Phase2 contracts and plans in progress; Phase1 accepted
+- Final polished UI: 29 frontend tests, production build and 24 real-data browser checks pass.
+- Independent Python suite: 26 tests pass. Latest measured full CLI calculations: 0.618 and 0.567 seconds.
+- Desktop, 390px and 304px screenshots inspected by root/executor/verifier; no horizontal page overflow. Narrow placeholder truncation and long mobile document are known minor limits; inspector anchor provides direct access.
+- Original CSV values and analytical semantics unchanged by UI redesign. No external runtime requests in the production browser checks.
+- Fresh dependency directories from a source archive passed launcher --check in 16.51 seconds using caches; this is not a clean OS VM test.
 
 ## Live Handoff
 
-- Latest request: user rejected graph/UI clarity. Phase 3 added through GSD phase.add; UI usability acceptance is reopened.
-- Active executor: astra_ui_redesign (gpt-6-astra, high), owns frontend and Phase 3 UI-SPEC/03-01-PLAN/SUMMARY. Parent owns integration checks, docs, STATE/ROADMAP and git.
-- Phase 2 functional checks: Python 26, frontend 16, browser 18 PASS; independent temporal recomputation PASS, CSV unchanged. This does not imply visual acceptance.
-- Phase 2 summaries and verification are ready; administrative closure pending. Latest confirmed push 78092de.
-- Product server http://127.0.0.1:8000; build frontend/dist to update. Prepared Python .venv and Chromium /tmp/money-graph-browsers.
-- Next: check Astra plan and UI-SPEC, implement, inspect real desktop/mobile graph, repair, verify, commit and push small increments.
-- AI assistant remains deferred by user.
+- astra_ui_redesign_resumed: finished source/design and 03-01-SUMMARY; latest polish commit 0cb3089 pushed to origin/main.
+- gsd_verify_recovery: owns Phase2 and Phase3 VERIFICATION plus final smoke assertions; final source is frozen; 03-02-SUMMARY ready. Phase3 user review is distinct from technical PASS.
+- gsd_plan_all_improvements: owns phases4–7 artifacts and their ROADMAP/REQUIREMENTS sections. Separate plan-checker still required.
+- Root owns STATE/PROJECT/AGENTS, integration summary, runtime config, final review and all git operations.
+- Live Vite preview: http://127.0.0.1:8000/ (exec session57933); data backend port8765 (session99919). UI changes refresh automatically. A new in-app browser tab was opened and marked deliverable.
+- Prepared .venv, frontend/node_modules, Chrome153 and /tmp/money-graph-browsers. Loopback checks require permitted execution in this environment.
+- Screenshots: /tmp/money-graph-desktop-phase3.png, /tmp/money-graph-mobile-phase3.png, /tmp/money-graph-mobile-304-phase3.png.
+- Exact next actions: commit integration artifacts; close Phase2 after fresh verification; record Phase3 needs user review; independently check all future plans; fix plan findings; commit/push and reconcile ROADMAP/REQUIREMENTS/STATE.
 
-### Roadmap Evolution
-- Phase 3 added: Понятное рабочее место AML-аналитика. Explicit user-requested redesign after functional verification.
+## Session Continuity
+
+Original MVP deadline was 2026-09-23 11:47 UTC; additional redesign/planning continued by user request. After each phase reread this STATE and ROADMAP. Preserve running preview servers and do not rerun completed work without new changes or unresolved concerns.

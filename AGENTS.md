@@ -59,6 +59,8 @@ Subagents: user permits choosing lower-cost models and effort. For new work pref
 
 Project commands: Judge launch is `python3 run.py` (prepares dependencies when needed, builds, computes, serves on port 8000); `python3 run.py --check` builds, computes, validates and exits; `--skip-install` uses prepared dependencies. Python runtime after setup is .venv/bin/python; batch is `python3 -m solution --data FINANCE-CASE/data --out output`. Frontend lives in frontend/; build/test commands are its package.json scripts. In the Codex sandbox, installation/network and loopback server tests may need exec escalation. This is an environment restriction, not a product workaround.
 
+UI changes: read DESIGN.md before modifying frontend layout, typography or graph presentation. Preserve original calculation evidence alongside readable explanations. For live development preview use Vite on port 8000 and the report server on 8765; stop that preview before the jury launcher uses port 8000.
+
 Working ownership: analytics owns solution/analytics.py and pipeline.py; frontend owns frontend/; integration owns CLI/server/independent contract tests/README. Interfaces live in docs/DATA-CONTRACT.md. Report JSON ids are strings (actual gid exceeds JS safe integers); CSV ids remain int64. All original organizer files stay unchanged.
 
 Library documentation: use Context7 resolve-library-id then query-docs for current library/SDK/API/CLI facts. Read docs/DATA-CONTRACT.md before changing analytics or frontend interfaces. Preserve organizer inputs under FINANCE-CASE.
