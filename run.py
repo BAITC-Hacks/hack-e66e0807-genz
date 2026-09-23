@@ -65,12 +65,13 @@ def main():
         execute([npm, "--prefix", ROOT / "frontend", "ci", "--no-audit", "--no-fund"])
     print("2/4 · Сборка локального интерфейса", flush=True)
     execute([npm, "--prefix", ROOT / "frontend", "run", "build"])
-    print("3/4 · Расчёт ролей, сообществ и временных признаков", flush=True)
+    print("3/4 · Расчёт ролей, временных признаков, маршрутов и сценариев", flush=True)
     execute([python, "-m", "solution", "--data", data, "--out", ROOT / "output"])
     if args.check:
         print("4/4 · Независимая проверка исходных данных и результата", flush=True)
         execute([python, ROOT / "scripts/verify_delivery.py", "--data", data, "--out", ROOT / "output"])
         execute([python, ROOT / "scripts/verify_temporal.py", "--data", data, "--out", ROOT / "output"])
+        execute([python, ROOT / "scripts/verify_extensions.py", "--data", data, "--out", ROOT / "output"])
         print("Проверки расчёта и локальной выдачи пройдены. Браузерный сценарий — в README.", flush=True)
     else:
         print(f"4/4 · Откройте http://127.0.0.1:{args.port} · Остановка: Ctrl+C", flush=True)

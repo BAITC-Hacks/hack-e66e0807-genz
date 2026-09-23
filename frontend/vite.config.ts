@@ -9,7 +9,7 @@ export default defineConfig({
     host: '127.0.0.1',
     port: 8000,
     strictPort: true,
-    proxy: { '/data': 'http://127.0.0.1:8765' },
+    proxy: { '/data': 'http://127.0.0.1:8765', '/api': { target: 'http://127.0.0.1:8765', changeOrigin: true } },
   },
   test: { environment: 'jsdom', globals: true },
 })

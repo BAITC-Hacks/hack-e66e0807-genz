@@ -56,3 +56,6 @@ node_modules/
 
 # Runtime coordination files are local, not submission artifacts.
 .planning/milestone.lock
+
+# Local CPU-model cache and runtime; never part of the submission source.
+.local-model/
