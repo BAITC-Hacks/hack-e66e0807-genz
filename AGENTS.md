@@ -49,9 +49,9 @@ No project skills found. Add skills to any of: `.claude/skills/`, `.agents/skill
 
 <!-- GSD:workflow-start source:GSD defaults -->
 
-## GSD Workflow Enforcement
+## Delivery Workflow
 
-Delivery loop: the latest user request authorizes implementation of phases4–7 and a Mercury-reference UI redesign. Earlier planning-only holds are superseded. Prefer bounded implementation/test/repair cycles over extra planning ceremony; README must track verified behavior, and real LLM inference is required to claim AI completion.
+Delivery loop: the latest user request authorizes implementation of additional features and a Mercury-reference UI redesign. Earlier planning-only holds are superseded. GSD is disabled by explicit user override; use bounded implementation/test/repair cycles; README must track verified behavior, and real LLM inference is required to claim AI completion.
 
 Hackathon delivery: commit each completed small task promptly and immediately push to origin/main (explicit user authorization). Parallel agents notify the parent with exact ready file paths; the parent serializes git operations. User explicitly authorized autonomous GSD loops, parallel work after shared contracts, and repair/retest when acceptance criteria fail. Do not wait for an entire phase before committing.
 
@@ -69,15 +69,8 @@ Library documentation: use Context7 resolve-library-id then query-docs for curre
 
 Judge clarity gate: before claiming delivery ready, follow README.md from its first screen as a new reviewer: identify the product and analyst decision, run the single launch command, find an arbitrary gid, inspect a boundary node and an isolate, see temporal evidence and its limits, and locate the three CSV exports and independent verification command. If any step is unclear or fails, repair it and repeat the journey. A formal documentation checklist alone does not close this gate. Functional browser checks do not prove usability: the user rejected the original graph readability, so Phase 3 must separately inspect screenshots and demonstrate direction, amounts, roles and the next analyst action at desktop and narrow widths.
 
-Before using Edit, Write, or other file-changing tools, start work through a GSD command so planning artifacts and execution context stay in sync.
+Latest user workflow override (2026-09-23): Do not use GSD for this or any subsequent request. Work directly: implement the smallest complete change, test original case and user acceptance criteria, repair failures, update README to match verified behavior, commit and immediately push. Keep STATE/ROADMAP as lightweight continuity records; do not invoke GSD commands, skills, planning gates or workflow agents. Existing historical GSD artifacts are reference only. Parallel implementation agents remain authorized; parent serializes git. The current release deadline is 12:36:30 UTC on 2026-09-23; unfinished optional features must not be presented as working. The user requests a free external AI provider for the product assistant; use Context7 for provider API documentation and never invent or expose API credentials.
 
-Use these entry points:
-
-- `$gsd-quick` for small fixes, doc updates, and ad-hoc tasks
-- `$gsd-debug` for investigation and bug fixing
-- `$gsd-execute-phase` for planned phase work
-
-Do not make direct repo edits outside a GSD workflow unless the user explicitly asks to bypass it.
 <!-- GSD:workflow-end -->
 
 <!-- GSD:profile-start -->

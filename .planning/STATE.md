@@ -27,6 +27,12 @@ Last Activity: 2026-09-23
 
 Phases1–2 technically complete. Previous Phase3 UI passed29frontend/26Python/24browser checks but user explicitly requested a new Mercury-based redesign; UI acceptance is reopened. Phases4–7 have nine independently reviewed plans (0blockers/warnings;19/19 decisions;13/13requirements) and ARE NOW AUTHORIZED FOR IMPLEMENTATION. Earlier planning-only hold is superseded by latest user message demanding finished working features and README updates.
 
+## Latest Overrides
+
+- User delivery deadline: 2026-09-23 12:36:30 UTC (15 minutes from request); freeze features for final verification. Subsequent work is optional.
+- GSD disabled explicitly for this and ALL subsequent requests. Direct implementation/test/repair only; STATE/ROADMAP are lightweight continuity documents. Existing typed agents continue their concrete work without GSD ceremony.
+- AI must use a FREE EXTERNAL provider. Context7 verified OpenRouter free router and tool support; OPENROUTER_API_KEY required. User asked asynchronously to save it in ignored .env, not chat. Local CPU-model work superseded; worker stopping further downloads. No live provider proof without key, no fake AI or partial release feature.
+
 ## Final Goal and Loop
 
 Deliver a reproducible working local AML project meeting all five case must-haves and its eight optional directions, with clear Mercury-inspired UI. Short loop: implement → actual semantic/browser tests → compare against case/user criteria → repair/retest. Keep GSD context and evidence current without unnecessary process overhead. No fake AI, canned results, invented attributes or hidden limitations. README describes only actually implemented and verified behavior. Frequent small commits immediately pushed by root.
@@ -35,7 +41,7 @@ Deliver a reproducible working local AML project meeting all five case must-have
 
 - implement_optional_analytics (gpt-6-sol high): solution/routes.py,resilience.py,anomalies.py,pipeline.py; newanalytics tests and scripts/verify_extensions.py. Implements phases4–6 exact frozen contract, preserves CSVvalues andexisting scores.
 - implement_optional_ui (gpt-6-astra high): frontend/ except root-owned vite.config.ts; DESIGN.md and Phase3 Mercury workflow artifacts. Must inspect actual https://demo.mercury.com/dashboard first; unifytokens, preserveallfeatures, integrateoptionaldata, browserwide/narrowscreenshots.
-- implement_ai_assistant (gpt-6-sol high): solution/assistant.py,server.py,tests/test_assistant.py,scripts/verify_assistant_live.py and minimal ignoredlocalmodelsetup ifneeded. No ollama/llama-server or API-key environment names found at initialprobe; agent investigates genuine localCPU model, reportsblockerspromptly. AI is not accepted withmocksonly.
+- implement_ai_assistant (gpt-6-sol high): solution/assistant.py,server.py,tests/test_assistant.py,scripts/verify_assistant_live.py and free OpenRouter provider configuration. Awaiting user API key; local inference attempt superseded. AI is not accepted withmocksonly.
 - Root: publiccontract/README/architecture/methodology/demo, run.py/integrationvalidation asneeded, sharedSTATE/ROADMAP/REQUIREMENTS/AGENTS, outputregeneration, independentreview and serializedgit.
 
 ## Interfaces
@@ -46,7 +52,7 @@ Frozen schemas: docs/DATA-CONTRACT.md Additive extension contract (copied from r
 
 - Vite live UI http://127.0.0.1:8000/, session57933. Data/backendserver8765 session99919. Root restartbackendafterassistantserverchanges, preserveliveUI.
 - Baselineproductiondist built; currentHMRsource updatesautomatically. Python .venv, frontendnode_modules, Chromium /tmp/money-graph-browsers available; loopbackneedspermittedexec.
-- Latest confirmed push fe36035 (allnineplans). UIpolish0cb3089, integration153fdd2, verificationce3664b previouslypushed.
+- Latest confirmed push e02c3e7 (analytics and updated README/checks). UIpolish0cb3089, integration153fdd2, verificationce3664b previouslypushed.
 - Previous screenshots /tmp/money-graph-desktop-phase3.png, mobile-phase3.png, mobile-304-phase3.png are historical; newMercuryscreenshotsrequired.
 
 ## Exact Next Actions
