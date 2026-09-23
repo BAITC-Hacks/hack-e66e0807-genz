@@ -1,4 +1,4 @@
-# Tested with CPython 3.14. Supported baseline: Python 3.11+.
+# Tested with CPython 3.14.4. Requires Python 3.12+ (except 3.14.1).
 pandas==3.0.6
 pyarrow==25.0.1
 networkx==3.7
