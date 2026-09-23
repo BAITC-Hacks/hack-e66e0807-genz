@@ -1,6 +1,5 @@
 """Behavior checks for the real parquet-to-artifact boundary."""
 import csv
-import importlib.util
 import tempfile
 import unittest
 from pathlib import Path
@@ -52,6 +51,43 @@ class PipelineTests(unittest.TestCase):
                 edges.to_parquet(data / "edges.parquet")
                 with self.assertRaisesRegex(ValueError, expected):
                     run(data, data / "out")
+
+
+class RoleTests(unittest.TestCase):
+    def classify(self, **changes):
+        import solution.analytics as analytics
+        self.assertTrue(callable(getattr(analytics, "classify_role", None)), "Formal role classifier must exist")
+        node = {"in_degree": 1, "out_degree": 1, "in_sum": 100000.0,
+                "out_sum": 50000.0, "pass_through": 0.5, "is_seed": False,
+                "boundary_censored": False, "seed_ancestors": 0, "betweenness": 0.0}
+        node.update(changes)
+        return analytics.classify_role(node)
+
+    def test_all_six_roles_and_precedence(self):
+        cases = [
+            ("coordinator", {"in_degree": 6, "out_degree": 2, "seed_ancestors": 3, "betweenness": 0.001}),
+            ("consolidator", {"in_degree": 3, "out_degree": 0, "pass_through": 0.0}),
+            ("distributor", {"in_degree": 2, "out_degree": 5}),
+            ("transit", {"pass_through": 0.8}),
+            ("terminal", {"out_degree": 0, "pass_through": 0.0}),
+            ("peripheral", {}),
+        ]
+        for expected, metrics in cases:
+            with self.subTest(expected=expected):
+                role, score, evidence = self.classify(**metrics)
+                self.assertEqual(role, expected)
+                self.assertTrue(0 <= score <= 1)
+                self.assertTrue(1 <= len(evidence) <= 200)
+
+    def test_seed_and_boundary_cannot_be_terminal(self):
+        for changes in ({"is_seed": True, "pass_through": None}, {"boundary_censored": True, "pass_through": 0.0}):
+            self.assertEqual(self.classify(out_degree=0, **changes)[0], "peripheral")
+
+    def test_transit_and_terminal_threshold_boundaries(self):
+        for ratio, expected in [(0.2, "terminal"), (0.20001, "peripheral"), (0.79999, "peripheral"), (0.8, "transit"), (1.2, "transit"), (1.20001, "peripheral")]:
+            self.assertEqual(self.classify(pass_through=ratio)[0], expected)
+        self.assertEqual(self.classify(in_degree=2, out_degree=0, pass_through=0)[0], "terminal")
+        self.assertEqual(self.classify(in_degree=3, out_degree=0, pass_through=0)[0], "consolidator")
 
 
 if __name__ == "__main__":
