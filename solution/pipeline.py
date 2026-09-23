@@ -8,6 +8,7 @@ import time
 from pathlib import Path
 
 import pandas as pd
+import networkx as nx
 
 from .analytics import RULES, analyze
 
@@ -80,6 +81,8 @@ def run_pipeline(data_dir: Path, out_dir: Path) -> dict:
         "schema_version": "1.0",
         "meta": {"n_nodes": len(nodes), "n_edges": len(edges), "n_transactions": len(tx),
                  "n_seed": int(nodes.is_seed.sum()), "total_kzt": math.fsum(edges.sum_kzt),
+                 "n_weak_components": nx.number_weakly_connected_components(graph),
+                 "n_isolates": nx.number_of_isolates(graph),
                  "period_start": tx.date.min().date().isoformat() if len(tx) else "",
                  "period_end": tx.date.max().date().isoformat() if len(tx) else "",
                  "elapsed_seconds": round(time.perf_counter() - started, 6),
