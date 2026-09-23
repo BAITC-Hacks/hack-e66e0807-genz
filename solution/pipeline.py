@@ -11,6 +11,7 @@ import pandas as pd
 import networkx as nx
 
 from .analytics import RULES, analyze
+from .temporal import enrich_temporal
 
 CSV_SCHEMAS = {
     "nodes_roles.csv": ["gid", "role", "role_score", "cluster_id", "priority_score", "evidence"],
@@ -79,6 +80,9 @@ def run_pipeline(data_dir: Path, out_dir: Path) -> dict:
     started = time.perf_counter()
     nodes, edges, tx = load_and_validate(Path(data_dir))
     records, clusters, top, graph = analyze(nodes, edges)
+    records = enrich_temporal(records, tx,
+                              tx.date.min().date() if len(tx) else None,
+                              tx.date.max().date() if len(tx) else None)
     report = {
         "schema_version": "1.0",
         "meta": {"n_nodes": len(nodes), "n_edges": len(edges), "n_transactions": len(tx),
