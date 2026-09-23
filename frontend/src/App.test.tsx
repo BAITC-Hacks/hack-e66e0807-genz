@@ -134,7 +134,7 @@ test('exploration pages all report nodes and combines four labeled filters witho
  const choose=(label:string,option:string)=>{fireEvent.click(screen.getByRole('combobox',{name:label}));fireEvent.click(screen.getByRole('option',{name:option}))}
  choose('Роль','Транзит')
  choose('Кластер','Кластер 1')
- choose('Seed','Только seed')
+ choose('Исходные узлы (seed)','Только исходные')
  choose('Граница выгрузки','Неграничные')
  expect(screen.getByText('По этим фильтрам узлы не найдены')).toBeVisible()
  fireEvent.change(screen.getByLabelText('Поиск по gid'),{target:{value:'100'}})
@@ -169,4 +169,19 @@ test('the priority workbench preserves twenty ranked rationales and opens any li
  fireEvent.click(screen.getByRole('button',{name:'Открыть узел 719 из рейтинга'}))
  expect(screen.getByRole('heading',{name:'Узел 719'})).toBeVisible()
  expect(screen.getByText('Наблюдение участника 19')).toBeVisible()
+})
+
+test('readable evidence preserves the exact source and links mobile flow to the current inspector', async () => {
+ const evidence='Гипотеза coordinator: связь с 7 seed по путям; входов 9, выходов 25; посредничество 0.00847.'
+ const why='Приоритет проверки 0.837: оборот 1513002.00 KZT; связей 34; путей от seed 7; посредничество 0.00847.'
+ vi.stubGlobal('fetch',vi.fn().mockResolvedValue({ok:true,json:async()=>({...fixture,nodes:[{...node,role:'coordinator',evidence}],top_nodes:[{rank:1,gid,role:'coordinator',priority_score:0.837,why}]})}))
+ render(<App />)
+ expect(await screen.findByText('Гипотеза «координация»: достижим из исходных узлов: 7; входов 9, выходов 25; посредничество 0.00847.')).toBeVisible()
+ expect(screen.getByText(/исходных узлов с путём к участнику: 7/)).toBeVisible()
+ const link=screen.getByRole('link',{name:'Основание и данные участника ↓'})
+ expect(link).toHaveAttribute('href','#participant-details')
+ expect(document.getElementById('participant-details')).toHaveTextContent(`Узел ${gid}`)
+ fireEvent.click(screen.getByText('Исходный текст расчёта',{selector:'summary'}))
+ expect(screen.getByText(evidence)).toBeVisible()
+ expect(screen.getByText(why)).toBeVisible()
 })

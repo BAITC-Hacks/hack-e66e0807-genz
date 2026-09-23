@@ -25,3 +25,11 @@ Automated: search outside filters, isolate/boundary warnings, combined filters/r
 
 ## Tool provenance
 Context7 React official docs resolved and queried for derived useMemo state. No new dependency needed. shadcn MCP is unavailable in this agent's exposed tool inventory; inspected installed official shadcn components are used directly.
+
+## Final user-directed typography refinement
+
+The user requested a deliberate distinctive aesthetic while retaining clear functional minimalism. The final direction is restrained industrial/editorial: IBM Plex Serif 500 titles (graph 25px desktop / 23px mobile, list 18px), Geist body, monospace full gids, paper/graphite/deep green and crisp top borders. Verified official `@fontsource/ibm-plex-serif@5.3.0` via npm metadata, installed pinned with scripts disabled, and bundled only Cyrillic/Latin 500. Context7 Fontsource docs resolved and queried for subset imports/Vite. No CDN. Small 120ms state transitions respect reduced-motion. Public DESIGN.md supersedes the initial no-new-font-dependency assumption above. Current-direction counts on mobile describe only the visible incoming or outgoing subset; desktop counts describe both lanes.
+
+## Resumed readability closure
+
+Current screenshots after restart exposed undersized secondary type and English report enum names despite the complete structural layout. Preserve the layout; minimum HTML label size is now 12px at desktop and mobile, with darker #5e6b62 secondary text and stronger warning contrast. SVG text scales with the graph, whose zoom remains available. Translate known role and seed-reachability phrases only; preserve numeric evidence, unknown prose and the original report. Inspector disclosure «Исходный текст расчёта» contains exact source evidence and selected ranking rationale when translated. Methodology defines seed; filters use «Исходные узлы (seed)». Mobile selected identity links directly to its inspector. This is a focused continuation of 03-01, not new analytics. See 03-UI-RESUME-GAPS.md for the actionable audit. Final user usability acceptance remains separate from automated or screenshot verification.
