@@ -7,6 +7,7 @@ import tempfile
 import threading
 import urllib.request
 import urllib.error
+import json
 from unittest.mock import patch
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -85,6 +86,7 @@ class ServerTests(unittest.TestCase):
             with self.subTest(path=path), self.assertRaises(urllib.error.HTTPError) as error:
                 urllib.request.urlopen(self.base + path)
             self.assertIn(error.exception.code, (403, 404))
+            error.exception.close()
 
     def test_missing_build_or_export_is_clear_error(self):
         from solution.server import make_server
@@ -93,6 +95,72 @@ class ServerTests(unittest.TestCase):
         (self.data / "report.json").unlink()
         with self.assertRaisesRegex(ValueError, "Published data missing"):
             make_server(self.data, self.ui, 0)
+
+
+class ValidatorTests(unittest.TestCase):
+    @classmethod
+    def setUpClass(cls):
+        import pandas as pd
+        from solution.pipeline import run_pipeline
+        cls.tmp = tempfile.TemporaryDirectory()
+        cls.addClassCleanup(cls.tmp.cleanup)
+        cls.data = Path(cls.tmp.name) / "inputs"
+        cls.out = Path(cls.tmp.name) / "outputs"
+        cls.data.mkdir()
+        ids = [9007199254740993 + i for i in range(21)]
+        pd.DataFrame({"gid": ids, "depth": [0] + [4] * 20, "is_seed": [True] + [False] * 20}).to_parquet(cls.data / "nodes.parquet")
+        pd.DataFrame({"src": [ids[0]], "dst": [ids[1]], "sum_kzt": [10000.0], "n_tx": [1], "depth": [1]}).to_parquet(cls.data / "edges.parquet")
+        pd.DataFrame({"src": [ids[0]], "dst": [ids[1]], "sum_kzt": [10000.0], "date": pd.to_datetime(["2025-07-01"])}).to_parquet(cls.data / "transactions.parquet")
+        run_pipeline(cls.data, cls.out)
+        cls.original = {p.name: p.read_bytes() for p in cls.out.iterdir() if p.is_file()}
+
+    def setUp(self):
+        for name, content in self.original.items():
+            (self.out / name).write_bytes(content)
+
+    def test_accepts_valid_exports_and_preserves_large_gid_and_isolates(self):
+        from scripts.verify_delivery import validate_exports
+        result = validate_exports(self.data, self.out)
+        self.assertEqual(result["nodes"], 21)
+        self.assertEqual(result["isolates"], 19)
+
+    def test_rejects_csv_schema_missing_duplicate_gid_and_bad_evidence(self):
+        from scripts.verify_delivery import validate_exports
+        import csv
+        path = self.out / "nodes_roles.csv"
+        for mutation in ("schema", "missing", "duplicate", "score", "evidence", "cluster"):
+            with self.subTest(mutation=mutation):
+                self.setUp()
+                with path.open(newline="") as stream:
+                    reader = csv.DictReader(stream)
+                    fields, rows = reader.fieldnames, list(reader)
+                if mutation == "schema": fields = list(reversed(fields))
+                elif mutation == "missing": rows.pop()
+                elif mutation == "duplicate": rows[1]["gid"] = rows[0]["gid"]
+                elif mutation == "score": rows[0]["role_score"] = "1.01"
+                elif mutation == "evidence": rows[0]["evidence"] = "x" * 201
+                elif mutation == "cluster": rows[0]["cluster_id"] = "999999"
+                with path.open("w", newline="") as stream:
+                    writer = csv.DictWriter(stream, fieldnames=fields)
+                    writer.writeheader()
+                    writer.writerows(rows)
+                with self.assertRaises(ValueError):
+                    validate_exports(self.data, self.out)
+
+    def test_rejects_nonstring_gid_nonfinite_json_and_rank_reference(self):
+        from scripts.verify_delivery import validate_exports
+        path = self.out / "report.json"
+        for mutation in ("gid", "nan", "rank", "cluster"):
+            with self.subTest(mutation=mutation):
+                self.setUp()
+                report = json.loads(path.read_text())
+                if mutation == "gid": report["nodes"][0]["gid"] = int(report["nodes"][0]["gid"])
+                elif mutation == "nan": report["nodes"][0]["role_score"] = float("nan")
+                elif mutation == "rank": report["top_nodes"][0]["gid"] = "missing"
+                elif mutation == "cluster": report["clusters"][0]["n_nodes"] += 1
+                path.write_text(json.dumps(report))
+                with self.assertRaises(ValueError):
+                    validate_exports(self.data, self.out)
 
 
 if __name__ == "__main__":
