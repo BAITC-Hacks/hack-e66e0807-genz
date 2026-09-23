@@ -1,12 +1,13 @@
 import '@testing-library/jest-dom/vitest'
 import { cleanup, render, screen, fireEvent } from '@testing-library/react'
-import { afterEach, expect, test, vi } from 'vitest'
+import { afterEach, beforeAll, expect, test, vi } from 'vitest'
 import App from './App'
 import { parseReport } from './contract'
 // Entirely synthetic fixture: never imported into production code.
 const gid = '999999999999999991'
 const node = {gid,depth:4,is_seed:false,role:'peripheral',role_score:0.2,cluster_id:0,priority_score:0.3,evidence:'Синтетический узел для проверки точности gid',in_degree:0,out_degree:0,in_sum:0,out_sum:0,pass_through:null,boundary_censored:true,seed_ancestors:0,betweenness:0,warnings:[]}
 const fixture = {schema_version:'1.0',meta:{n_nodes:1,n_edges:0,n_transactions:0,n_seed:0,total_kzt:0,period_start:'2025-01-01',period_end:'2025-02-01',elapsed_seconds:0,warnings:[]},nodes:[node],edges:[],clusters:[{cluster_id:0,n_nodes:1,n_seed:0,sum_kzt_internal:0,top_gids:[gid],hypothesis:'Синтетическое сообщество'}],top_nodes:[]}
+beforeAll(()=>{HTMLElement.prototype.scrollIntoView=vi.fn()})
 afterEach(() => { cleanup(); vi.unstubAllGlobals() })
 test('exact string gid beyond safe integer finds fetched evidence', async () => {
  vi.stubGlobal('fetch',vi.fn().mockResolvedValue({ok:true,json:async()=>fixture}))
@@ -79,7 +80,7 @@ test('selected node shows dated temporal evidence, incoming profile and ordered 
  expect(screen.getByText('Через 1–2 дня после поступления')).toBeVisible()
  expect(screen.getByText('2025-01-02 → 2025-01-03')).toBeVisible()
  expect(screen.getByText('Совпадение дат не доказывает, что переводились те же деньги.')).toBeVisible()
- expect(screen.getByText(/3 плательщика/)).toBeVisible()
+ expect(screen.getAllByText(/3 плательщика/)).toHaveLength(2)
  expect(screen.getByText(/Граница глубины 4/)).toBeVisible()
  expect(screen.getByRole('heading',{name:'Какие данные запросить дальше'})).toBeVisible()
  expect(screen.getByText(requests[0])).toBeVisible()
@@ -95,4 +96,40 @@ test('older reports omit temporal sections and malformed optional evidence is no
  expect(await screen.findByText('Часть дополнительных данных недоступна. Основные сведения об узле сохранены.')).toBeVisible()
  expect(screen.getByRole('heading',{name:`Узел ${gid}`})).toBeVisible()
  expect(screen.queryByRole('heading',{name:'Временные признаки'})).not.toBeInTheDocument()
+})
+test('exploration pages all report nodes and combines four labeled filters without narrowing gid search',async()=>{
+ const nodes=Array.from({length:25},(_,i)=>({...node,gid:String(100+i),role:i%2?'transit':'peripheral',cluster_id:i%3,is_seed:i%4===0,boundary_censored:i%5===0,priority_score:i/100,evidence:`Узел ${i}`}))
+ const clusters=[0,1,2].map(cluster_id=>({cluster_id,n_nodes:nodes.filter(n=>n.cluster_id===cluster_id).length,n_seed:2,sum_kzt_internal:100+cluster_id,top_gids:[],hypothesis:`Гипотеза ${cluster_id}`}))
+ vi.stubGlobal('fetch',vi.fn().mockResolvedValue({ok:true,json:async()=>({...fixture,nodes,clusters,top_nodes:[]})}))
+ render(<App />)
+ expect(await screen.findByRole('heading',{name:'Исследование выборки'})).toBeVisible()
+ expect(screen.getAllByRole('button',{name:/^Открыть узел \d+$/})).toHaveLength(20)
+ expect(screen.getAllByRole('button',{name:/^Открыть узел \d+$/})[0]).toHaveAccessibleName('Открыть узел 124')
+ expect(screen.getByText('Показано 20 из 25 узлов')).toBeVisible()
+ fireEvent.click(screen.getByRole('button',{name:'Показать ещё'}))
+ expect(screen.getAllByRole('button',{name:/^Открыть узел \d+$/})).toHaveLength(25)
+ const choose=(label:string,option:string)=>{fireEvent.click(screen.getByRole('combobox',{name:label}));fireEvent.click(screen.getByRole('option',{name:option}))}
+ choose('Роль','Транзит')
+ choose('Кластер','Кластер 1')
+ choose('Seed','Только seed')
+ choose('Граница выгрузки','Неграничные')
+ expect(screen.getByText('По этим фильтрам узлы не найдены')).toBeVisible()
+ fireEvent.change(screen.getByLabelText('Поиск по gid'),{target:{value:'100'}})
+ fireEvent.click(screen.getByRole('button',{name:'Найти узел'}))
+ expect(screen.getByRole('heading',{name:'Узел 100'})).toBeVisible()
+ fireEvent.click(screen.getByRole('button',{name:'Сбросить фильтры'}))
+ expect(screen.getByText('Показано 20 из 25 узлов')).toBeVisible()
+})
+test('cluster overview focuses results and member navigation uses the existing inspector',async()=>{
+ const other={...node,gid:'222',cluster_id:1,role:'transit',evidence:'Участник второго кластера'}
+ vi.stubGlobal('fetch',vi.fn().mockResolvedValue({ok:true,json:async()=>({...fixture,nodes:[node,other],clusters:[{cluster_id:0,n_nodes:1,n_seed:0,sum_kzt_internal:0,top_gids:[gid],hypothesis:'Первый кластер'},{cluster_id:1,n_nodes:1,n_seed:0,sum_kzt_internal:300,top_gids:[other.gid],hypothesis:'Второй кластер'}],top_nodes:[{rank:1,gid,role:'peripheral',priority_score:0.3,why:'Проверить'}]})}))
+ render(<App />)
+ fireEvent.click(await screen.findByRole('button',{name:'Исследовать кластер 1'}))
+ expect(screen.getByRole('heading',{name:'Результаты исследования'})).toHaveFocus()
+ expect(screen.getByText('в выборке: 1 узел',{exact:false})).toBeVisible()
+ expect(screen.getByRole('combobox',{name:'Кластер'})).toHaveTextContent('Кластер 1')
+ expect(screen.getByRole('heading',{name:`Узел ${gid}`})).toBeVisible()
+ fireEvent.click(screen.getByRole('button',{name:'Открыть узел 222'}))
+ expect(screen.getByRole('heading',{name:'Узел 222'})).toBeVisible()
+ expect(screen.getByText('Участник второго кластера')).toBeVisible()
 })
