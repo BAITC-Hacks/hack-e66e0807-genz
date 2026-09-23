@@ -1,8 +1,13 @@
 """Loopback-only static UI and explicitly allowlisted published data."""
 import argparse
+import json
+import os
 from http.server import SimpleHTTPRequestHandler, ThreadingHTTPServer
 from pathlib import Path
 from urllib.parse import unquote, urlsplit
+
+from solution.assistant import (MAX_BODY, AssistantConfig, AssistantEvidenceError,
+                                AssistantInputError, AssistantUnavailable, answer_question)
 
 DATA_FILES = frozenset({"report.json", "nodes_roles.csv", "clusters.csv", "top_nodes.csv"})
 
@@ -14,8 +19,88 @@ def make_server(data_dir, ui_dir, port=8000):
     for name in sorted(DATA_FILES):
         if not (data_root / name).is_file():
             raise ValueError(f"Published data missing: {data_root / name}; run python -m solution first")
+    assistant_config = AssistantConfig.from_env()
+    dev_origin = os.getenv("ASSISTANT_DEV_ORIGIN", AssistantConfig._local_env().get("ASSISTANT_DEV_ORIGIN", ""))
+    parsed_dev_origin = urlsplit(dev_origin)
+    if (parsed_dev_origin.scheme != "http" or parsed_dev_origin.hostname not in ("127.0.0.1", "localhost")
+            or parsed_dev_origin.path or parsed_dev_origin.query or parsed_dev_origin.fragment):
+        dev_origin = ""
+    assistant_report = None
+    if assistant_config.enabled:
+        try:
+            assistant_report = json.loads((data_root / "report.json").read_text(encoding="utf-8"))
+        except (OSError, ValueError) as exc:
+            raise ValueError("Assistant cannot read report.json") from exc
 
     class Handler(SimpleHTTPRequestHandler):
+        def _assistant_json(self, code, payload):
+            data = json.dumps(payload, ensure_ascii=False, allow_nan=False).encode("utf-8")
+            self.send_response(code)
+            self.send_header("Content-Type", "application/json; charset=utf-8")
+            self.send_header("Content-Length", str(len(data)))
+            self.send_header("X-Content-Type-Options", "nosniff")
+            self.send_header("Cache-Control", "no-store")
+            self.end_headers()
+            self.wfile.write(data)
+
+        def _assistant_host_allowed(self):
+            host = self.headers.get("Host", "")
+            return host in (f"127.0.0.1:{self.server.server_port}",
+                            f"localhost:{self.server.server_port}")
+
+        def do_GET(self):
+            if urlsplit(self.path).path == "/api/assistant/status":
+                if not self._assistant_host_allowed():
+                    self._assistant_json(403, {"status": "invalid_request", "error": "Invalid host"})
+                    return
+                self._assistant_json(200, assistant_config.status())
+                return
+            super().do_GET()
+
+        def do_POST(self):
+            if urlsplit(self.path).path != "/api/assistant/query" or urlsplit(self.path).query:
+                self._assistant_json(404, {"status": "invalid_request", "error": "Unknown route"})
+                return
+            if not self._assistant_host_allowed():
+                self._assistant_json(403, {"status": "invalid_request", "error": "Invalid host"})
+                return
+            origin = self.headers.get("Origin")
+            if origin and origin not in (f"http://127.0.0.1:{self.server.server_port}",
+                                         f"http://localhost:{self.server.server_port}", dev_origin):
+                self._assistant_json(403, {"status": "invalid_request", "error": "Invalid origin"})
+                return
+            if not assistant_config.enabled:
+                self._assistant_json(503, {"status": "disabled", "error": "Assistant is disabled"})
+                return
+            if not assistant_config.status()["configured"]:
+                self._assistant_json(503, {"status": "unavailable", "error": "Assistant is not configured"})
+                return
+            if self.headers.get("Content-Type", "").split(";", 1)[0].strip().lower() != "application/json":
+                self._assistant_json(415, {"status": "invalid_request", "error": "JSON required"})
+                return
+            try:
+                size = int(self.headers.get("Content-Length", ""))
+            except ValueError:
+                size = -1
+            if not 1 <= size <= MAX_BODY:
+                self._assistant_json(413, {"status": "invalid_request", "error": "Request size exceeds limit"})
+                return
+            try:
+                payload = json.loads(self.rfile.read(size))
+                if not isinstance(payload, dict) or set(payload) - {"question", "selected_gid"}:
+                    raise AssistantInputError("Invalid request fields")
+                result = answer_question(assistant_report, payload.get("question"), payload.get("selected_gid"), assistant_config)
+            except AssistantEvidenceError:
+                self._assistant_json(422, {"status": "insufficient_evidence", "error": "Недостаточно проверяемых данных для ответа."})
+                return
+            except AssistantUnavailable:
+                self._assistant_json(503, {"status": "unavailable", "error": "Модель недоступна; отчёт и экспорты работают."})
+                return
+            except (AssistantInputError, ValueError, UnicodeError) as exc:
+                self._assistant_json(400, {"status": "invalid_request", "error": str(exc)[:160]})
+                return
+            self._assistant_json(200, result)
+
         def send_head(self):
             try:
                 route = unquote(urlsplit(self.path).path, errors="strict")
