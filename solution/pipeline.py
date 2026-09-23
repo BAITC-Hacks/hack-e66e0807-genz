@@ -9,7 +9,7 @@ from pathlib import Path
 
 import pandas as pd
 
-from .analytics import analyze
+from .analytics import RULES, analyze
 
 CSV_SCHEMAS = {
     "nodes_roles.csv": ["gid", "role", "role_score", "cluster_id", "priority_score", "evidence"],
@@ -87,7 +87,7 @@ def run_pipeline(data_dir: Path, out_dir: Path) -> dict:
                               "Наблюдаются только внутрибанковские исходящие переводы июля 2026 от 5000 KZT до depth=4; это не полный баланс."]},
         "nodes": records,
         "edges": [{"src": str(int(r.src)), "dst": str(int(r.dst)), "sum_kzt": float(r.sum_kzt), "n_tx": int(r.n_tx)} for r in edges.itertuples(index=False)],
-        "clusters": clusters, "top_nodes": top,
+        "clusters": clusters, "top_nodes": top, "methodology": RULES,
     }
     serialized = json.dumps(report, ensure_ascii=False, allow_nan=False, separators=(",", ":"))
     out_dir = Path(out_dir)

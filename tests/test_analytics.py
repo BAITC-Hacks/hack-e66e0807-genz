@@ -1,5 +1,6 @@
 """Behavior checks for the real parquet-to-artifact boundary."""
 import csv
+import math
 import tempfile
 import unittest
 from pathlib import Path
@@ -88,6 +89,48 @@ class RoleTests(unittest.TestCase):
             self.assertEqual(self.classify(pass_through=ratio)[0], expected)
         self.assertEqual(self.classify(in_degree=2, out_degree=0, pass_through=0)[0], "terminal")
         self.assertEqual(self.classify(in_degree=3, out_degree=0, pass_through=0)[0], "consolidator")
+
+
+class CommunityTests(unittest.TestCase):
+    def test_weighted_communities_split_bridge_and_preserve_isolate(self):
+        from solution.analytics import analyze
+        nodes = pd.DataFrame({"gid": range(1, 8), "depth": [0, 1, 2, 1, 2, 3, 0], "is_seed": [True, False, False, False, False, False, True]})
+        pairs = [(1, 2, 1000), (2, 3, 1000), (3, 1, 1000), (4, 5, 1000), (5, 6, 1000), (6, 4, 1000), (3, 4, 1)]
+        edges = pd.DataFrame([{"src": a, "dst": b, "sum_kzt": float(w), "n_tx": 1} for a, b, w in pairs])
+        records, clusters, top, _ = analyze(nodes, edges)
+        by_gid = {n["gid"]: n for n in records}
+        self.assertNotEqual(by_gid["1"]["cluster_id"], by_gid["4"]["cluster_id"])
+        isolate = next(c for c in clusters if c["cluster_id"] == by_gid["7"]["cluster_id"])
+        self.assertEqual(isolate["n_nodes"], 1)
+        self.assertEqual(isolate["sum_kzt_internal"], 0)
+        self.assertGreater(top[0]["priority_score"], 0)
+        self.assertEqual(by_gid["7"]["priority_score"], 0)
+        self.assertEqual(math.fsum(c["sum_kzt_internal"] for c in clusters), 6000)
+
+    def test_real_pipeline_is_complete_and_csv_deterministic(self):
+        from solution.pipeline import run_pipeline
+        data = Path("FINANCE-CASE/data")
+        with tempfile.TemporaryDirectory() as tmp:
+            first, second = Path(tmp) / "first", Path(tmp) / "second"
+            report = run_pipeline(data, first)
+            run_pipeline(data, second)
+            expected = pd.read_parquet(data / "nodes.parquet")
+            self.assertEqual({n["gid"] for n in report["nodes"]}, {str(g) for g in expected.gid})
+            self.assertEqual(len(report["nodes"]), len(expected))
+            self.assertGreaterEqual(len(report["top_nodes"]), 20)
+            self.assertEqual(len({n["gid"] for n in report["top_nodes"]}), len(report["top_nodes"]))
+            self.assertEqual(report["top_nodes"], sorted(report["top_nodes"], key=lambda n: (-n["priority_score"], int(n["gid"]))))
+            for filename in ("nodes_roles.csv", "clusters.csv", "top_nodes.csv"):
+                self.assertEqual((first / filename).read_bytes(), (second / filename).read_bytes())
+            self.assertEqual(sum(c["n_nodes"] for c in report["clusters"]), len(expected))
+            for n in report["nodes"]:
+                self.assertTrue(math.isfinite(n["priority_score"]))
+                self.assertTrue(0 <= n["priority_score"] <= 1)
+                self.assertTrue(1 <= len(n["evidence"]) <= 200)
+                if n["is_seed"] or n["in_sum"] == 0:
+                    self.assertIsNone(n["pass_through"])
+                if n["boundary_censored"] or n["is_seed"]:
+                    self.assertNotEqual(n["role"], "terminal")
 
 
 if __name__ == "__main__":
