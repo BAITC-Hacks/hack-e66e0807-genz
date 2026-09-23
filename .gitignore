@@ -50,3 +50,6 @@ artifacts/
 mlruns/
 wandb/
 *.log
+
+# Frontend dependencies; committed output/ contains submission exports.
+node_modules/
