@@ -121,6 +121,34 @@ class RoleTests(unittest.TestCase):
 
 
 class CommunityTests(unittest.TestCase):
+    def test_cluster_hypotheses_distinguish_flow_purposes_and_uncertainty(self):
+        from solution.analytics import analyze
+        gids = [1, 2, 3, 4, 10, 11, 12, 13, 14, 15, 20, 21, 22, 99]
+        nodes = pd.DataFrame({"gid": gids,
+                              "depth": [0, 0, 0, 1, 0, 1, 1, 1, 1, 1, 0, 1, 2, 4],
+                              "is_seed": [True, True, True, False, True, False, False, False,
+                                          False, False, True, False, False, False]})
+        pairs = [(1, 4), (2, 4), (3, 4),
+                 (10, 11), (10, 12), (10, 13), (10, 14), (10, 15),
+                 (20, 21), (21, 22)]
+        edges = pd.DataFrame([{"src": src, "dst": dst, "sum_kzt": 1000.0, "n_tx": 1}
+                              for src, dst in pairs])
+        records, clusters, _, _ = analyze(nodes, edges)
+        cluster_by_gid = {n["gid"]: next(c for c in clusters if c["cluster_id"] == n["cluster_id"])
+                          for n in records}
+
+        self.assertIn("сбор средств", cluster_by_gid["4"]["hypothesis"])
+        self.assertIn("сбор 1", cluster_by_gid["4"]["hypothesis"])
+        self.assertIn("3000.00 KZT", cluster_by_gid["4"]["hypothesis"])
+        self.assertIn("распределение средств", cluster_by_gid["10"]["hypothesis"])
+        self.assertIn("распределение 1", cluster_by_gid["10"]["hypothesis"])
+        self.assertIn("транзит средств", cluster_by_gid["21"]["hypothesis"])
+        self.assertIn("транзит 1", cluster_by_gid["21"]["hypothesis"])
+        self.assertIn("назначение по наблюдаемым переводам не определяется",
+                      cluster_by_gid["99"]["hypothesis"])
+        self.assertIn("внутренние переводы 0.00 KZT", cluster_by_gid["99"]["hypothesis"])
+        self.assertNotIn("4 узлов", cluster_by_gid["4"]["hypothesis"])
+
     def test_weighted_communities_split_bridge_and_preserve_isolate(self):
         from solution.analytics import analyze
         nodes = pd.DataFrame({"gid": range(1, 8), "depth": [0, 1, 2, 1, 2, 3, 0], "is_seed": [True, False, False, False, False, False, True]})

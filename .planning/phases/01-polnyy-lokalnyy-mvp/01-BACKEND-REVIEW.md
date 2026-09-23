@@ -17,7 +17,7 @@ findings:
   warning: 0
   info: 0
   total: 1
-status: issues_found
+status: repaired_pending_independent_verification
 ---
 
 # Phase 01: Backend Code Review
@@ -40,3 +40,7 @@ The pipeline preserves large `gid` values as strings in JSON, retains isolates, 
 
 _Reviewer: gsd-code-reviewer_
 _Depth: deep_
+
+## Repair evidence — 2026-09-23
+
+CR-01 repaired: cluster_hypothesis now distinguishes collection, distribution, transit, mixed structure and insufficient evidence using role counts and internal turnover. Added regression coverage for distinct structures and isolates. Analytics 10/10 and combined Python 20/20 pass; full real-data browser acceptance passes. Independent phase verifier will confirm closure.

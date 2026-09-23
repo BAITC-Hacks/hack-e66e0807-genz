@@ -54,6 +54,31 @@ def classify_role(node):
     return role, round(min(max(score, 0), 1), 6), evidence[:200]
 
 
+def cluster_hypothesis(group, by_gid, internal_sum):
+    """Describe a possible flow purpose using observed roles, not inferred control."""
+    signals = {
+        "consolidator": sum(by_gid[gid]["role"] == "consolidator" for gid in group),
+        "distributor": sum(by_gid[gid]["role"] == "distributor" for gid in group),
+        "transit": sum(by_gid[gid]["role"] == "transit" for gid in group),
+    }
+    descriptions = {
+        "consolidator": "сбор средств",
+        "distributor": "распределение средств",
+        "transit": "транзит средств",
+    }
+    ranked = sorted(signals, key=lambda role: (-signals[role], role))
+    if signals[ranked[0]] == 0:
+        purpose = "назначение по наблюдаемым переводам не определяется"
+    elif signals[ranked[1]] == 0 or signals[ranked[0]] >= 2 * signals[ranked[1]]:
+        purpose = descriptions[ranked[0]]
+    else:
+        purpose = "смешанный поток: " + ", ".join(descriptions[role] for role in ranked if signals[role])
+    return (f"Гипотеза о назначении: {purpose}; признаки по ролям — "
+            f"сбор {signals['consolidator']}, распределение {signals['distributor']}, "
+            f"транзит {signals['transit']}; внутренние переводы {internal_sum:.2f} KZT. "
+            "Это направление проверки, не вывод об общем контроле или виновности.")
+
+
 def analyze(nodes, edges):
     graph = nx.DiGraph()
     graph.add_nodes_from(int(row.gid) for row in nodes.itertuples(index=False))
@@ -115,12 +140,14 @@ def analyze(nodes, edges):
             + 0.25 * (node["betweenness"] / max_between if max_between > 0 else 0), 6)
     ranked = sorted(records, key=lambda n: (-n["priority_score"], int(n["gid"])))
     by_gid = {int(n["gid"]): n for n in records}
-    clusters = [{"cluster_id": i, "n_nodes": len(group),
-                 "n_seed": sum(n["is_seed"] for n in records if int(n["gid"]) in group),
-                 "sum_kzt_internal": math.fsum(d["sum_kzt"] for u, v, d in graph.edges(data=True) if u in group and v in group),
-                 "top_gids": [str(g) for g in sorted(group, key=lambda g: (-by_gid[g]["priority_score"], g))[:5]],
-                 "hypothesis": f"Гипотеза сообщества: {len(group)} узлов, {sum(by_gid[g]['is_seed'] for g in group)} seed; денежные связи не доказывают общий контроль."}
-                for i, group in enumerate(communities)]
+    clusters = []
+    for i, group in enumerate(communities):
+        internal_sum = math.fsum(d["sum_kzt"] for u, v, d in graph.edges(data=True) if u in group and v in group)
+        clusters.append({"cluster_id": i, "n_nodes": len(group),
+                         "n_seed": sum(by_gid[gid]["is_seed"] for gid in group),
+                         "sum_kzt_internal": internal_sum,
+                         "top_gids": [str(g) for g in sorted(group, key=lambda g: (-by_gid[g]["priority_score"], g))[:5]],
+                         "hypothesis": cluster_hypothesis(group, by_gid, internal_sum)})
     top = [{"rank": i + 1, "gid": n["gid"], "role": n["role"], "priority_score": n["priority_score"],
             "why": f"Приоритет проверки {n['priority_score']:.3f}: оборот {n['in_sum']+n['out_sum']:.2f} KZT; связей {n['in_degree']+n['out_degree']}; путей от seed {n['seed_ancestors']}; посредничество {n['betweenness']:.5f}."}
            for i, n in enumerate(ranked[:50])]
